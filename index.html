@@ -70,7 +70,6 @@ body {
   align-items: center;
   text-align: center;
   color: #fff;
-  background: rgba(0,0,0,0.3);
   padding: 20px;
 }
 
@@ -239,25 +238,23 @@ section.juegos.visible h2 {
   font-size: 1rem;
   line-height: 1.8;
   position: relative;
-  padding-left: 0; /* quitamos estrella */
+  padding-left: 0;
 }
 
 /* Contenedor para imagen y botón */
 .discord-footer {
   display: flex;
-  flex-direction: column; /* vertical */
+  flex-direction: column;
   align-items: center;
   margin-top: 20px;
 }
 
-/* Imagen de Discord */
 .discord-img {
   width: 60px;
   height: 60px;
   margin-bottom: 15px;
 }
 
-/* Botón de ayuda */
 .btn-ayuda {
   display: block;
   width: fit-content;
@@ -298,6 +295,35 @@ footer {
   .video-slider .overlay h1 { font-size: 1.8rem; }
   #tierra { width: 250px; }
 }
+
+@media (max-width: 300px) {
+  .juego { flex: 0 0 140px; height: 100px; }
+  .slider-track { gap: 10px; }
+  .video-slider .overlay h1 { font-size: 1.3rem; }
+  .video-slider .overlay p { font-size: 0.9rem; }
+  .video-slider .overlay .btn-discord { padding: 10px 25px; font-size: 0.9rem; }
+  #tierra { width: 180px; }
+  .reglas h2 { font-size: 1.4rem; }
+  .reglas li { font-size: 0.85rem; line-height: 1.4; }
+  footer { font-size: 0.75rem; padding: 20px 10px; }
+}
+
+.video-slider .overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Esto centra exactamente */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  padding: 20px;
+  width: 90%; /* Opcional: para que no sobresalga en pantallas pequeñas */
+  max-width: 500px; /* Mantener un ancho máximo */
+}
+
 </style>
 </head>
 <body>
@@ -314,7 +340,7 @@ footer {
     Tu navegador no soporta videos.
   </video>
   <div class="overlay">
-    <h1>El Mundillo Cósmico 🍀</h1>
+    <h1>El Mundillo Cósmico</h1>
     <p>Explora el universo gamer junto a nuestra tripulación estelar en Discord.</p>
     <a href="https://discord.gg/QxvPEdZ9mN" class="btn-discord">✨ Únete al Servidor ✨</a>
   </div>
@@ -327,7 +353,6 @@ footer {
 <div class="gato-volador" style="top:80%; left:15%; animation-duration:9s;">😹</div>
 
 <section class="juegos">
-  <h2></h2>
   <div class="slider">
     <div class="slider-track">
       <div class="juego"><img src="https://cdn1.epicgames.com/offer/24b9b5e323bc40eea252a10cdd3b2f10/EGS_LeagueofLegends_RiotGames_S1_2560x1440-47eb328eac5ddd63ebd096ded7d0d5ab" alt="League of Legends"><div class="descripcion">Domina la Grieta del Invocador.</div></div>
@@ -335,20 +360,9 @@ footer {
       <div class="juego"><img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_4/2x1_NSwitch_Minecraft.jpg" alt="Minecraft"><div class="descripcion">Crea, explora y sobrevive.</div></div>
       <div class="juego"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/capsule_616x353.jpg?t=1749053861" alt="CS2"><div class="descripcion">Combate rápido y preciso.</div></div>
       <div class="juego"><img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/413150/capsule_616x353.jpg?t=1754692865" alt="Stardew Valley"><div class="descripcion">Relájate cultivando paz.</div></div>
-    <div class="juego">
-  <img src="https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2021/05/gta-v-arte-grande-2321051.jpg?tf=3840x" alt="Grand Theft Auto V">
-  <div class="descripcion">Gran mundo abierto criminal.</div>
-</div>
-
-<div class="juego">
-  <img src="https://gaming-cdn.com/images/products/309/orig/euro-truck-simulator-2-pc-mac-juego-steam-europe-us-canada-cover.jpg?v=1732535055" alt="Euro Truck Simulator 2">
-  <div class="descripcion">Conduce por Europa como rey de la carretera.</div>
-</div>
-
-<div class="juego">
-  <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3241660/1ea445e044a2d5b09cfa8291350b63ebed6e5741/header.jpg?t=1761229251" alt="Juego desconocido">
-  <div class="descripcion">Descripción pendiente.</div>
-</div>
+      <div class="juego"><img src="https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2021/05/gta-v-arte-grande-2321051.jpg?tf=3840x" alt="GTA V"><div class="descripcion">Gran mundo abierto criminal.</div></div>
+      <div class="juego"><img src="https://gaming-cdn.com/images/products/309/orig/euro-truck-simulator-2-pc-mac-juego-steam-europe-us-canada-cover.jpg?v=1732535055" alt="Euro Truck Simulator 2"><div class="descripcion">Conduce por Europa como rey de la carretera.</div></div>
+      <div class="juego"><img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3241660/1ea445e044a2d5b09cfa8291350b63ebed6e5741/header.jpg?t=1761229251" alt="Juego desconocido"><div class="descripcion">Descripción pendiente.</div></div>
     </div>
   </div>
 </section>
@@ -364,10 +378,6 @@ footer {
     <li>🚀 Evita contenido inapropiado u ofensivo.</li>
     <li>🚀 Usa los canales correctos para cada tema.</li>
   </ul>
-
-<br>
-<br>
-
 </section>
 
 <footer>
