@@ -324,6 +324,39 @@ footer {
   max-width: 500px; /* Mantener un ancho máximo */
 }
 
+@media (max-width: 768px) {
+  .video-slider video {
+    width: auto;     /* evita estiramiento horizontal */
+    height: 100%;    /* altura completa */
+    left: 50%;
+    transform: translateX(-50%); /* centra horizontalmente */
+  }
+}
+
+.video-slider {
+  position: relative;
+  width: 100%;      /* usar 100% del contenedor, no 100vw */
+  height: 100vh;
+  overflow: hidden; /* importante para que nada sobresalga */
+}
+
+.video-slider video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;  /* asegura que siempre cubra */
+  min-height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  pointer-events: none; /* opcional, evita interacción táctil */
+}
+
+html, body {
+  overflow-x: hidden; /* evita scroll horizontal */
+}
+
+
+
 </style>
 </head>
 <body>
