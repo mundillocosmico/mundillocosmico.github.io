@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AnimeBox+ | Streaming Premium</title>
+  <link rel="shortcut icon" href="forma-de-espiral-de-galaxia.png" type="image/x-icon">
+  <title>El Secreto del Universo</title>
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,13 +88,13 @@
     .progress-fill{height:100%;background:var(--accent);border-radius:6px;position:relative}
     .progress-fill::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:var(--accent);opacity:0;transition:opacity .2s}
     .progress-bar:hover .progress-fill::after{opacity:1}
-    .controls-bottom{display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .controls-left,.controls-right{display:flex;align-items:center;gap:10px}
-    .cbtn{background:none;border:0;color:#fff;cursor:pointer;font-size:1.6rem;padding:6px 12px;border-radius:8px}
+    .controls-bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .controls-left,.controls-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .cbtn{background:none;border:0;color:#fff;cursor:pointer;font-size:1.3rem;padding:8px 12px;border-radius:8px}
     .cbtn:hover{background:rgba(0,168,225,.3);color:var(--accent);transform:scale(1.08)}
-    .time-display{font-family:"Courier New",monospace;font-weight:600;min-width:140px}
-    .volume{display:flex;align-items:center;gap:10px;background:rgba(0,168,225,.18);padding:8px 12px;border-radius:8px}
-    .volume-slider{width:120px;height:6px;background:rgba(255,255,255,.25);border-radius:4px;cursor:pointer}
+    .time-display{font-family:"Courier New",monospace;font-weight:600;min-width:120px;text-align:center;font-size:.9rem}
+    .volume{display:flex;align-items:center;gap:6px;background:rgba(0,168,225,.18);padding:6px 10px;border-radius:8px;flex-wrap:wrap}
+    .volume-slider{width:100px;height:6px;background:rgba(255,255,255,.25);border-radius:4px;cursor:pointer}
     .episodes{margin-top:26px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12)}
     .episodes h3{margin-bottom:12px;text-transform:uppercase}
     .episodes > div{display:flex;flex-wrap:wrap;gap:10px;max-height:340px;overflow:auto;padding-right:8px}
@@ -104,14 +105,20 @@
       .slider{height:46vh}
       .poster{flex:1 1 auto;max-width:60%;margin:0 auto}
       .details h2{font-size:1.8rem}
+      .video-controls{padding:36px 16px 16px}
+      .time-display{min-width:100px;font-size:.85rem}
+      .volume-slider{width:80px}
+      .cbtn{font-size:1.1rem;padding:6px 10px}
     }
     @media (max-width: 680px){
       .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
       .card img{height:200px}
-      .video-controls{padding:36px 16px 16px}
-      .time-display{min-width:120px;font-size:.95rem}
-      .volume-slider{width:90px}
+      .video-controls{padding:24px 12px 12px}
+      .time-display{min-width:90px;font-size:.8rem}
+      .volume-slider{width:60px}
+      .cbtn{font-size:1rem;padding:4px 8px}
     }
+    
   </style>
 </head>
 <body>
@@ -132,9 +139,9 @@
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" data-tab="anime">📺 Peliculas y Series</button>
-      <button class="tab-btn" data-tab="canales">📡 Canales</button>
-      <button class="tab-btn" data-tab="favoritos">⭐ Favoritos</button>
+      <button class="tab-btn active" data-tab="anime"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m160-800 80 160h120l-80-160h80l80 160h120l-80-160h80l80 160h120l-80-160h120q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800Zm0 240v320h640v-320H160Zm0 0v320-320Z"/></svg> Peliculas y Series</button>
+      <button class="tab-btn" data-tab="canales"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m380-340 280-180-280-180v360Zm-60 220v-80H160q-33 0-56.5-23.5T80-280v-480q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v480q0 33-23.5 56.5T800-200H640v80H320ZM160-280h640v-480H160v480Zm0 0v-480 480Z"/></svg> Canales</button>
+      <button class="tab-btn" data-tab="favoritos"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/></svg> Favoritos</button>
     </div>
 
     <h2 id="sectionTitle"></h2>
@@ -170,11 +177,11 @@
                 </div>
                 <div class="controls-right">
                   <div class="volume">
-                    <button id="volDown" class="cbtn" title="Bajar volumen">➖</button>
-                    <span>🔊</span>
+                    <button id="volDown" class="cbtn" title="Bajar volumen"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-360v-240h160l200-200v640L360-360H200Zm440 40v-322q45 21 72.5 65t27.5 97q0 53-27.5 96T640-320ZM480-606l-86 86H280v80h114l86 86v-252ZM380-480Z"/></svg></button>
+                    <span><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M280-360v-240h160l200-200v640L440-360H280Zm80-80h114l86 86v-252l-86 86H360v80Zm100-40Z"/></svg></span>
                     <div id="volumeSlider" class="volume-slider" aria-label="Volumen"></div>
-                    <button id="volUp" class="cbtn" title="Subir volumen">➕</button>
-                    <button id="muteBtn" class="cbtn" title="Silencio">🔇</button>
+                    <button id="volUp" class="cbtn" title="Subir volumen"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z"/></svg></button>
+                    <button id="muteBtn" class="cbtn" title="Silencio"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m616-320-56-56 104-104-104-104 56-56 104 104 104-104 56 56-104 104 104 104-56 56-104-104-104 104Zm-496-40v-240h160l200-200v640L280-360H120Zm280-246-86 86H200v80h114l86 86v-252ZM300-480Z"/></svg></button>
                   </div>
                   <button id="fullscreenBtn" class="cbtn" title="Pantalla completa">⛶</button>
                 </div>
@@ -370,7 +377,7 @@
     }
 
     // Controls wiring
-    detailVideo.addEventListener('play',()=>{ playBtn.textContent='⏸'; });
+    detailVideo.addEventListener('play',()=>{ playBtn.textContent='||'; });
     detailVideo.addEventListener('pause',()=>{ playBtn.textContent='▶'; });
     detailVideo.addEventListener('timeupdate',()=>{ progressFill.style.width = (detailVideo.currentTime/detailVideo.duration*100||0)+'%'; currentTimeEl.textContent=fmt(detailVideo.currentTime) });
     detailVideo.addEventListener('loadedmetadata',()=>{ durationEl.textContent=fmt(detailVideo.duration) });
@@ -564,6 +571,22 @@ function playSource(src, autoplay=false){
 
   playerContainer.classList.add('active');
 }
+
+ // ====== CONTROL DE VISIBILIDAD DE BOTONES ======
+  let hideControlsTimeout;
+  const showControls = () => {
+    videoControls.classList.add('visible');
+    clearTimeout(hideControlsTimeout);
+    hideControlsTimeout = setTimeout(()=> videoControls.classList.remove('visible'), 5000);
+  };
+
+  // Mostrar al cargar, mover mouse o tocar pantalla
+  playerWrapper.addEventListener('mousemove', showControls);
+  playerWrapper.addEventListener('touchstart', showControls);
+  playerWrapper.addEventListener('touchmove', showControls);
+
+  // Mostrar controles al iniciar
+  detailVideo.addEventListener('play', showControls);
 
   </script>
 </body>
