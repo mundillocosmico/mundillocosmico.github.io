@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clon de Netflix (Arreglado)</title>
+    <style>
+        /* === 1. Variables y Reset === */
+        :root {
+            --color-fondo: #141414;
+            --color-texto: #ffffff;
+            --color-primario: #e50914; /* Rojo Netflix */
+            --padding-lateral: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            overflow-x: hidden; /* Evita el scroll horizontal general */
+        }
+
+        /* === 2. Estilos del Encabezado y Navegación === */
+        header {
+            padding: 20px var(--padding-lateral);
+            background-color: var(--color-fondo);
+        }
+
+        .logo {
+            color: var(--color-primario);
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* === 3. Estilos de Fila (Row) - El Corazón del Scroll === */
+        .movie-row {
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .movie-row h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            padding-left: var(--padding-lateral); /* Alinea el título */
+        }
+
+        /* Contenedor principal de la lista de películas */
+        .row__list-container {
+            position: relative;
+            /* Oculta las flechas de scroll nativas, pero mantiene la funcionalidad */
+            overflow: hidden; 
+        }
+
+        /* Lista de películas: la que se desplaza */
+        .row__list {
+            display: flex; /* **CLAVE 1: Disposición horizontal** */
+            overflow-x: scroll; /* **CLAVE 2: Habilita el scroll horizontal** */
+            overflow-y: hidden;
+            padding-left: var(--padding-lateral);
+            padding-right: var(--padding-lateral);
+            /* Importante para un scroll suave al usar JS (o botones) */
+            scroll-behavior: smooth;
+            /* Truco para ocultar la barra de desplazamiento en algunos navegadores */
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        /* Oculta la barra de scroll en Webkit (Chrome, Safari) */
+        .row__list::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* === 4. Estilos de "Caps" (Tarjetas de Película) === */
+        .movie-cap {
+            width: 280px; /* Ancho fijo para desktop */
+            min-width: 280px; /* Evita que se encoja */
+            height: 157.5px; /* Proporción 16:9 */
+            border-radius: 4px;
+            margin-right: 8px; /* Espacio entre "caps" */
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            /* **CLAVE 3: Transición para el efecto suave** */
+            transition: transform 0.3s ease; 
+        }
+
+        .movie-cap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* **CLAVE 4: El efecto hover de escala/zoom** */
+        .movie-cap:hover {
+            transform: scale(1.05); /* Ligeramente más grande */
+            z-index: 10; /* Se superpone a las vecinas */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* === 5. Responsive (Ajuste para móviles y tablets) === */
+        @media (max-width: 900px) {
+            :root {
+                --padding-lateral: 20px;
+            }
+            .movie-cap {
+                width: 200px; /* Más pequeñas en móviles */
+                min-width: 200px;
+                height: 112.5px;
+            }
+            .movie-row h2, header {
+                padding-left: var(--padding-lateral);
+                padding-right: var(--padding-lateral);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">NETFLIX</div>
+    </header>
+
+    <main>
+        
+        <section class="movie-row" id="row-tendencias">
+            <h2>Tendencias ahora</h2>
+            <div class="row__list-container">
+                <div class="row__list">
+                    <div class="movie-cap" data-id="1"><img src="https://via.placeholder.com/280x157.5?text=Cap+1" alt="Pelicula 1"></div>
+                    <div class="movie-cap" data-id="2"><img src="https://via.placeholder.com/280x157.5?text=Cap+2" alt="Pelicula 2"></div>
+                    <div class="movie-cap" data-id="3"><img src="https://via.placeholder.com/280x157.5?text=Cap+3" alt="Pelicula 3"></div>
+                    <div class="movie-cap" data-id="4"><img src="https://via.placeholder.com/280x157.5?text=Cap+4" alt="Pelicula 4"></div>
+                    <div class="movie-cap" data-id="5"><img src="https://via.placeholder.com/280x157.5?text=Cap+5" alt="Pelicula 5"></div>
+                    <div class="movie-cap" data-id="6"><img src="https://via.placeholder.com/280x157.5?text=Cap+6" alt="Pelicula 6"></div>
+                    <div class="movie-cap" data-id="7"><img src="https://via.placeholder.com/280x157.5?text=Cap+7" alt="Pelicula 7"></div>
+                    <div class="movie-cap" data-id="8"><img src="https://via.placeholder.com/280x157.5?text=Cap+8" alt="Pelicula 8"></div>
+                    <div class="movie-cap" data-id="9"><img src="https://via.placeholder.com/280x157.5?text=Cap+9" alt="Pelicula 9"></div>
+                    <div class="movie-cap" data-id="10"><img src="https://via.placeholder.com/280x157.5?text=Cap+10" alt="Pelicula 10"></div>
+                    <div class="movie-cap" data-id="11"><img src="https://via.placeholder.com/280x157.5?text=Cap+11" alt="Pelicula 11"></div>
+                    <div class="movie-cap" data-id="12"><img src="https://via.placeholder.com/280x157.5?text=Cap+12" alt="Pelicula 12"></div>
+                    <div class="movie-cap" data-id="13"><img src="https://via.placeholder.com/280x157.5?text=Cap+13" alt="Pelicula 13"></div>
+                    <div class="movie-cap" data-id="14"><img src="https://via.placeholder.com/280x157.5?text=Cap+14" alt="Pelicula 14"></div>
+                    <div class="movie-cap" data-id="15"><img src="https://via.placeholder.com/280x157.5?text=Cap+15" alt="Pelicula 15"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="movie-row" id="row-continuar">
+            <h2>Continuar viendo</h2>
+            <div class="row__list-container">
+                <div class="row__list">
+                    <div class="movie-cap" data-id="16"><img src="https://via.placeholder.com/280x157.5?text=Cap+16" alt="Pelicula 16"></div>
+                    <div class="movie-cap" data-id="17"><img src="https://via.placeholder.com/280x157.5?text=Cap+17" alt="Pelicula 17"></div>
+                    <div class="movie-cap" data-id="18"><img src="https://via.placeholder.com/280x157.5?text=Cap+18" alt="Pelicula 18"></div>
+                    <div class="movie-cap" data-id="19"><img src="https://via.placeholder.com/280x157.5?text=Cap+19" alt="Pelicula 19"></div>
+                    <div class="movie-cap" data-id="20"><img src="https://via.placeholder.com/280x157.5?text=Cap+20" alt="Pelicula 20"></div>
+                    <div class="movie-cap" data-id="21"><img src="https://via.placeholder.com/280x157.5?text=Cap+21" alt="Pelicula 21"></div>
+                    <div class="movie-cap" data-id="22"><img src="https://via.placeholder.com/280x157.5?text=Cap+22" alt="Pelicula 22"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const caps = document.querySelectorAll('.movie-cap');
+
+            // **Arreglo de Bug de Selección (Ejemplo simple)**
+            caps.forEach(cap => {
+                cap.addEventListener('click', () => {
+                    // Simulación de selección o clic
+                    console.log('¡Cap seleccionada! ID:', cap.dataset.id);
+
+                    // Aquí puedes añadir o quitar una clase 'seleccionada' si lo necesitas
+                    // caps.forEach(c => c.classList.remove('active-cap'));
+                    // cap.classList.add('active-cap'); 
+
+                    alert('Has hecho clic en la película ' + cap.dataset.id);
+                    
+                    // En un clon real, esto abriría un modal o te llevaría a la página de detalles
+                });
+            });
+
+            // **Nota sobre el Scroll:** El scroll horizontal ya está funcional usando el ratón/trackpad
+            // o arrastrando en dispositivos táctiles, gracias al CSS:
+            // .row__list { overflow-x: scroll; }
+            
+        });
+    </script>
+
+</body>
+</html>
