@@ -1356,6 +1356,7 @@ a {
         <i class="fas fa-broadcast-tower"></i>
         <span>Cargar Canal de Prueba (CV.m3u8)</span>
       </button>
+      <p style="color: var(--text-secondary); margin-top: 10px; font-size: 14px;">La lista de canales (toro.m3u8) y el canal de prueba (CV.m3u8) se cargan desde URLs de GitHub para simulación.</p>
     </div>
   </div>
 
@@ -1372,7 +1373,7 @@ a {
       <div class="detail-hero">
         <img id="detail-bg" class="detail-bg" src="" alt="">
         <div class="detail-overlay"></div>
-        <button id="detail-close" class="player-close"><i class="fas fa-arrow-left"></i></button>
+        <button id="detail-close" class="player-close header-btn" style="position: absolute; top: 20px; left: 20px; z-index: 100;"><i class="fas fa-arrow-left"></i></button>
       </div>
       <div class="detail-content">
         <div class="detail-header">
@@ -1515,22 +1516,26 @@ let heroInterval;
 let heroFeatured = [];
 let channels = [];
 
+// Infinite Scroll State
+let moviesLimit = 30;
+let seriesLimit = 30;
+let channelsLimit = 30;
+let favoritesLimit = 30;
+let currentScreen = 'home'; // Estado para saber qué pantalla tiene el scroll activo
+const LOAD_INCREMENT = 30;
+
 // Video Playback Functions
 function initPlayer() {
     if (player) {
         player.destroy();
     }
     player = new Plyr(videoPlayerHLS, {
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen', 'settings'],
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen', 'settings', 'pip'],
         settings: ['quality', 'speed'],
     });
 
     // Manejar el cierre del reproductor (por ejemplo, al salir de fullscreen)
     player.on('ended', closePlayer);
-    player.on('exitfullscreen', () => {
-        // En móviles, salir de pantalla completa puede no ser suficiente para salir de la vista del reproductor
-        // Es más seguro dejar que el usuario use el botón de retroceso o un botón de cerrar si lo hubiese.
-    });
 }
 
 function closePlayer() {
@@ -1634,16 +1639,21 @@ function playVideoWithHLS(url, itemId, episodeIndex = 0) {
         if (itemId !== 'channel' && itemId !== 'direct') {
             localStorage.removeItem(`progress_${itemId}_${episodeIndex}`); // Eliminar progreso guardado
             localStorage.setItem(`watched_${itemId}_${episodeIndex}`, 'true'); // Marcar como visto
+            closePlayer(); // Cerrar solo si es VOD
         }
-        closePlayer();
     });
 }
 
+/**
+ * Función centralizada para reproducir streams M3U8 (canales).
+ * @param {string} url La URL del stream M3U8.
+ * @param {string} title El título del canal (opcional).
+ */
 function playM3U8Stream(url, title) {
     if (title) {
-      alert(`Reproduciendo canal: ${title}`);
+      console.log(`Reproduciendo canal: ${title}`);
     } else {
-      alert('Reproduciendo stream M3U8...');
+      console.log('Reproduciendo stream M3U8...');
     }
     
     // Usamos 'channel' como ID genérico para que no intente guardar progreso.
@@ -1652,6 +1662,7 @@ function playM3U8Stream(url, title) {
 
 // Conectar el botón de prueba M3U8
 document.getElementById('play-cv-m3u8').addEventListener('click', () => {
+  // Nota: Esta es una URL de prueba. En un entorno real, debe ser un M3U8 funcional.
   const M3U8_URL = 'https://raw.githubusercontent.com/R3D-GHOST/json/refs/heads/main/CV.m3u8';
   playM3U8Stream(M3U8_URL, 'Canal de Prueba CV');
 });
@@ -1668,6 +1679,9 @@ function switchScreen(screenId) {
   document.querySelectorAll(`[data-screen="${screenId}"]`).forEach(item => {
     item.classList.add('active');
   });
+  
+  // Update current screen for infinite scroll
+  currentScreen = screenId;
 }
 
 function formatTime(seconds) {
@@ -1748,7 +1762,8 @@ async function loadChannels() {
           title: name,
           name: name,
           logo: logoMatch ? logoMatch[1] : null,
-          isChannel: true
+          isChannel: true,
+          id: 'channel-' + (channels.length + 1) // Añadir un ID único
         };
         
       } else if (line && !line.startsWith('#') && line.includes('http') && currentChannel) {
@@ -1819,7 +1834,7 @@ function createContentCard(item) {
   
   if (item.episodes) {
     card.classList.add('series');
-  } else if (item.url) {
+  } else if (item.isChannel) {
     card.classList.add('channel');
   } else {
     card.classList.add('movie');
@@ -1845,7 +1860,7 @@ function createContentCard(item) {
   videoLink.onclick = (e) => {
     e.preventDefault();
     if (item.isChannel && item.url) {
-      playM3U8Stream(item.url, item.title); // Usar la nueva función para canales M3U8
+      playM3U8Stream(item.url, item.title); // Usar la función para canales M3U8
     } else if (item.video_url) {
       playVideoWithHLS(item.video_url, item.title);
     } else if (item.episodes) {
@@ -1873,52 +1888,88 @@ function createContentCard(item) {
   }
   
   // Agregar data-attributes para clic en detail
-  if (!item.isChannel) {
-      card.dataset.item = JSON.stringify(item);
-      card.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (e.target.classList.contains('video-link') || e.target.closest('.video-link')) return;
+  card.dataset.item = JSON.stringify(item);
+  card.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Si no es un canal, y no se ha pulsado el enlace de reproducción
+      if (!item.isChannel && !(e.target.classList.contains('video-link') || e.target.closest('.video-link'))) {
           showDetail(item);
-      });
-  }
+      }
+  });
 
   return card;
 }
 
-function renderMovies() {
+/**
+ * Renderiza películas con paginación
+ * @param {number} limit Límite de elementos a renderizar
+ * @param {boolean} append Si se deben añadir a los existentes
+ */
+function renderMovies(limit = 30, append = false) {
   const container = document.getElementById('movies-content');
-  container.innerHTML = '';
+  const itemsToRender = allData.movies.slice(0, limit);
   
-  allData.movies.forEach(movie => {
-    container.appendChild(createContentCard(movie));
-  });
+  if (!append) {
+    container.innerHTML = '';
+  }
+  
+  const currentCount = container.children.length;
+  for (let i = currentCount; i < itemsToRender.length; i++) {
+    container.appendChild(createContentCard(itemsToRender[i]));
+  }
+  
+  moviesLimit = itemsToRender.length;
 }
 
-function renderSeries() {
+/**
+ * Renderiza series con paginación
+ * @param {number} limit Límite de elementos a renderizar
+ * @param {boolean} append Si se deben añadir a los existentes
+ */
+function renderSeries(limit = 30, append = false) {
   const container = document.getElementById('series-content');
-  container.innerHTML = '';
-
-  allData.series.forEach(series => {
-    container.appendChild(createContentCard(series));
-  });
+  const itemsToRender = allData.series.slice(0, limit);
+  
+  if (!append) {
+    container.innerHTML = '';
+  }
+  
+  const currentCount = container.children.length;
+  for (let i = currentCount; i < itemsToRender.length; i++) {
+    container.appendChild(createContentCard(itemsToRender[i]));
+  }
+  
+  seriesLimit = itemsToRender.length;
 }
 
-function renderFavorites() {
+/**
+ * Renderiza favoritos con paginación
+ * @param {number} limit Límite de elementos a renderizar
+ * @param {boolean} append Si se deben añadir a los existentes
+ */
+function renderFavorites(limit = 30, append = false) {
   const container = document.getElementById('favorites-content');
-  container.innerHTML = '';
-  
   const favItems = favorites.map(id => {
     return allData.movies.find(m => m.title === id) || allData.series.find(s => s.title === id);
   }).filter(Boolean);
+
+  const itemsToRender = favItems.slice(0, limit);
   
-  if (favItems.length === 0) {
-    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No tienes contenido en tu lista</p>';
-    return;
+  if (!append) {
+    container.innerHTML = '';
+    if (favItems.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No tienes contenido en tu lista</p>';
+      favoritesLimit = 0;
+      return;
+    }
+  }
+
+  const currentCount = container.children.length;
+  for (let i = currentCount; i < itemsToRender.length; i++) {
+    container.appendChild(createContentCard(itemsToRender[i]));
   }
   
-  favItems.forEach(item => {
-    container.appendChild(createContentCard(item));
-  });
+  favoritesLimit = itemsToRender.length;
 }
 
 function renderHome() {
@@ -1936,6 +1987,7 @@ function renderHome() {
           <div class="content-grid"></div>
       `;
       const grid = section.querySelector('.content-grid');
+      // Home siempre muestra los primeros 8
       items.slice(0, 8).forEach(item => {
           const card = createContentCard(item);
           grid.appendChild(card);
@@ -1950,23 +2002,33 @@ function renderHome() {
   if (allData.series.length > 0) {
     homeContent.appendChild(generateSection('Series Destacadas', allData.series, 'series'));
   }
-
-  // Los event listeners se adjuntan en createContentCard ahora
 }
 
-function renderChannels() {
+/**
+ * Renderiza canales con paginación
+ * @param {number} limit Límite de elementos a renderizar
+ * @param {boolean} append Si se deben añadir a los existentes
+ */
+function renderChannels(limit = 30, append = false) {
   const container = document.getElementById('channels-content');
-  container.innerHTML = '';
   
-  if (channels.length === 0) {
-    container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No se encontraron canales</p>';
-    return;
+  if (!append) {
+    container.innerHTML = '';
+    if (channels.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">No se encontraron canales</p>';
+      channelsLimit = 0;
+      return;
+    }
   }
   
-  channels.forEach(channel => {
-    const card = createContentCard(channel);
-    container.appendChild(card);
-  });
+  const itemsToRender = channels.slice(0, limit);
+  const currentCount = container.children.length;
+  
+  for (let i = currentCount; i < itemsToRender.length; i++) {
+    container.appendChild(createContentCard(itemsToRender[i]));
+  }
+  
+  channelsLimit = itemsToRender.length;
 }
 
 // Obtener porcentaje de progreso
@@ -2016,6 +2078,8 @@ function showDetail(item) {
     const newIsFavorite = favorites.includes(item.title);
     detailFavorite.innerHTML = `<i class="fas fa-heart${newIsFavorite ? '' : '-o'}"></i><span>${newIsFavorite ? 'En Mi Lista' : 'Añadir a Mi Lista'}</span>`;
     detailFavorite.className = `action-btn action-btn-secondary ${newIsFavorite ? 'active' : ''}`;
+    // Re-renderizar favoritos si estamos en esa pantalla
+    if (currentScreen === 'favorites') renderFavorites(favoritesLimit, false);
   };
   
   // Setup play button
@@ -2051,7 +2115,7 @@ function showDetail(item) {
     detailEpisodes.style.display = 'none';
     backToSeriesBtn.style.display = 'none';
     detailClose.innerHTML = '<i class="fas fa-times"></i>';
-    detailClose.onclick = () => switchScreen('home');
+    detailClose.onclick = () => switchScreen(currentScreen === 'home' || currentScreen === 'detail' ? 'home' : currentScreen);
   }
   
   switchScreen('detail');
@@ -2085,6 +2149,7 @@ function renderEpisodes(series) {
     
     episodeCard.addEventListener('click', (e) => {
       e.preventDefault();
+      // Marcar como visto al reproducir
       localStorage.setItem(`watched_${series.title}_${index}`, 'true');
       episodeCard.classList.add('watched');
       playVideoWithHLS(episode.video_url, series.title, index);
@@ -2116,12 +2181,15 @@ function setupSearch() {
   searchBtn.onclick = () => {
     searchModal.classList.add('active');
     searchInput.focus();
+    // No scroll infinito en búsqueda, renderiza todo de golpe al teclear.
+    window.removeEventListener('scroll', handleInfiniteScroll);
   };
   
   searchClose.onclick = () => {
     searchModal.classList.remove('active');
     searchInput.value = '';
     searchGrid.innerHTML = '';
+    window.addEventListener('scroll', handleInfiniteScroll);
   };
   
   searchInput.oninput = (e) => {
@@ -2167,19 +2235,66 @@ function setupSearch() {
   };
 }
 
+// Infinite Scroll Logic
+function handleInfiniteScroll() {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const clientHeight = document.documentElement.clientHeight;
+
+    // Detectar si el usuario está cerca del final de la página (dentro de 100px)
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+        let newLimit = 0;
+        let totalItems = 0;
+
+        switch (currentScreen) {
+            case 'movies':
+                newLimit = moviesLimit + LOAD_INCREMENT;
+                totalItems = allData.movies.length;
+                if (newLimit > totalItems) newLimit = totalItems;
+                if (newLimit > moviesLimit) renderMovies(newLimit, true);
+                break;
+            case 'series':
+                newLimit = seriesLimit + LOAD_INCREMENT;
+                totalItems = allData.series.length;
+                if (newLimit > totalItems) newLimit = totalItems;
+                if (newLimit > seriesLimit) renderSeries(newLimit, true);
+                break;
+            case 'channels':
+                newLimit = channelsLimit + LOAD_INCREMENT;
+                totalItems = channels.length;
+                if (newLimit > totalItems) newLimit = totalItems;
+                if (newLimit > channelsLimit) renderChannels(newLimit, true);
+                break;
+            case 'favorites':
+                newLimit = favoritesLimit + LOAD_INCREMENT;
+                // Los favoritos se recalculan, el total debe ser la longitud del array de favoritos
+                const favItems = favorites.map(id => {
+                  return allData.movies.find(m => m.title === id) || allData.series.find(s => s.title === id);
+                }).filter(Boolean);
+                totalItems = favItems.length;
+                if (newLimit > totalItems) newLimit = totalItems;
+                if (newLimit > favoritesLimit) renderFavorites(newLimit, true);
+                break;
+        }
+    }
+}
+
 // Navigation
 navItems.forEach(item => {
   item.onclick = (e) => {
     e.preventDefault();
     const screen = e.target.closest('[data-screen]').dataset.screen;
     
-    if (screen === 'movies') renderMovies();
-    if (screen === 'series') renderSeries();
-    if (screen === 'favorites') renderFavorites();
-    if (screen === 'channels') renderChannels();
+    // Al hacer clic, cargamos solo el incremento inicial (30)
+    if (screen === 'movies') renderMovies(LOAD_INCREMENT, false); 
+    if (screen === 'series') renderSeries(LOAD_INCREMENT, false); 
+    if (screen === 'favorites') renderFavorites(LOAD_INCREMENT, false); 
+    if (screen === 'channels') renderChannels(LOAD_INCREMENT, false); 
     if (screen === 'search') return;
     
     switchScreen(screen);
+    // Reiniciar scroll al cambiar de pantalla principal
+    window.scrollTo({ top: 0 });
   };
 });
 
@@ -2190,7 +2305,11 @@ async function init() {
   setupHero();
   setupSearch();
   renderHome();
-  renderChannels();
+  // La pantalla de canales se renderiza una vez para cargar los primeros 30
+  renderChannels(LOAD_INCREMENT, false); 
+  
+  // Activar el listener para el scroll infinito
+  window.addEventListener('scroll', handleInfiniteScroll);
   
   setTimeout(() => {
     loader.classList.add('hidden');
