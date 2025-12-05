@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimeBox+ | Streaming Premium (PC)</title>
+    <title>PrimeBox+ | Streaming Premium (PC Optimizado)</title>
     <meta name="theme-color" content="#0f171e">
     
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
@@ -21,7 +21,7 @@
         /* ------------------------------------------- */
         *{ box-sizing:border-box; margin:0; padding:0; }
         :root{ 
-            /* Colores de Amazon Prime Video */
+            /* Colores */
             --bg-primary: #0f171e; 
             --bg-card: #1a242f; 
             --bg-darker: #000000; 
@@ -30,9 +30,10 @@
             --accent: #00a8e1; 
             --accent-2: #4ec2e7; 
             --shadow-dark: rgba(0, 0, 0, 0.9); 
-            --shadow-accent: rgba(0, 168, 225, 0.5); 
-            --nav-width: 70px; /* Ancho para el menú vertical */
-            --content-padding: 3vw; 
+            
+            /* Layout PC */
+            --nav-width: 80px; /* Ancho para el menú vertical */
+            --content-padding: 30px; /* Padding lateral fijo para desktop */
             --watched-color: #3b4d61; 
         } 
         /* 🚀 BASE: Ajuste para PC/Portátil */
@@ -49,28 +50,31 @@
         /* 🖥️ Layout principal de PC */
         main{ 
             position: absolute; 
-            top: 0; left: var(--nav-width); right: 0; bottom: 0; 
-            padding-bottom: 0; 
+            top: 0; 
+            left: var(--nav-width); 
+            right: 0; 
+            bottom: 0; 
             overflow: hidden; 
         } 
         /* Vistas con scroll interno */
         #mainView, #searchView, #detailView, #playerView { 
             height: 100%; 
             width: 100%; 
-            /* Permitir el scroll vertical SOLO dentro de estas vistas */
             overflow-y: auto; 
             overflow-x: hidden; 
             position: relative; 
-            padding-bottom: 20px; /* Espacio inferior para contenido */
+            padding-bottom: 20px; 
             scroll-behavior: smooth; 
         } 
-        /* Ajuste de padding para las vistas principales */
-        #mainView, #searchView, #detailView {
+        /* Padding horizontal para vistas de contenido */
+        #mainView, #searchView, #detailView > .detail-header, #detailView > .detail-main, #detailView > .episodes, #detailView > #recommendationsSection {
             padding-left: var(--content-padding);
             padding-right: var(--content-padding);
         }
-        
+
+        /* ------------------------------------------- */
         /* 🧭 MENÚ DE NAVEGACIÓN VERTICAL (SideNav) */
+        /* ------------------------------------------- */
         #sideNav { 
             position: fixed; top: 0; left: 0; width: var(--nav-width); height: 100%; 
             background: var(--bg-darker); border-right: 1px solid rgba(255, 255, 255, 0.05); 
@@ -79,85 +83,131 @@
         } 
         .nav-item { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 10px 0; width: 100%; color: var(--muted); font-size: 0.75rem; 
+            padding: 12px 0; width: 100%; color: var(--muted); font-size: 0.75rem; 
             font-weight: 500; cursor: pointer; user-select: none; margin-bottom: 15px;
-            transition: color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), background-color 0.3s; 
+            transition: color 0.3s, background-color 0.3s, border-left-color 0.3s; 
         } 
-        .nav-item i { font-size: 1.4rem; margin-bottom: 5px; } 
+        .nav-item i { font-size: 1.5rem; margin-bottom: 5px; } 
         .nav-item.active { color: var(--text); background-color: var(--bg-card); border-left: 3px solid var(--accent); } 
         .nav-item:hover { color: var(--text); background-color: var(--bg-card); outline: none; } 
-
+        
+        /* ------------------------------------------- */
         /* 🔎 VISTA DE BUSCADOR */
+        /* ------------------------------------------- */
         #searchView { 
-            position: fixed; inset: 0; left: var(--nav-width); background: var(--bg-primary); z-index: 55; padding-top: 24px; display: none; padding-bottom: 24px; 
+            position: fixed; inset: 0; left: var(--nav-width); background: var(--bg-primary); z-index: 55; padding-top: 40px; display: none; 
             animation: fadeIn .3s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
         } 
-        /* Ajuste de márgenes para PC */
-        #searchHeader { margin-bottom: 30px; padding: 0; position: sticky; top: 0; z-index: 60; padding-top: 20px; padding-bottom: 10px; } 
-        #backFromSearch { display: none !important; } /* Ocultar el botón de volver de la búsqueda en PC */
-        #searchResultsTitle { font-size: 1.8rem; padding: 0; margin-bottom: 20px; } 
+        @keyframes fadeIn {from{opacity:0; transform: translateY(10px);} to{opacity:1; transform: translateY(0);}}
+        #searchHeader { 
+            display: flex; align-items: center; gap: 10px; margin-bottom: 30px; 
+            position: sticky; top: 0; z-index: 60; padding-top: 20px; padding-bottom: 10px; 
+            background: var(--bg-primary); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); 
+        } 
+        #searchInput { 
+            flex-grow: 1; padding: 12px 18px; border-radius: 6px; border: 2px solid var(--bg-card); 
+            font-size: 1.1rem; background: var(--bg-card); color: var(--text); 
+            transition: border-color .3s, box-shadow .3s; 
+        } 
+        #searchInput:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent); outline: none; } 
+        #searchResultsTitle { font-size: 1.8rem; margin-bottom: 20px; font-weight: 600; } 
         #searchResultsGrid { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; 
-            padding: 0; 
         } 
         
-        /* 🎬 SECCIONES DE CONTENIDO */
+        /* ------------------------------------------- */
+        /* 🎬 SECCIONES DE CONTENIDO (Home/Grid) */
+        /* ------------------------------------------- */
         #mainView { padding-top: 20px; } 
         .content-section { padding: 25px 0 10px 0; margin-bottom: 10px; } 
-        .section-title { font-size: 2rem; padding: 0; margin-bottom: 15px; border-left: 4px solid var(--accent); padding-left: 14px; } 
+        .section-title { font-size: 2rem; font-weight: 700; margin-bottom: 15px; border-left: 4px solid var(--accent); padding-left: 14px; } 
+        /* SLIDER DE SCROLL HORIZONTAL */
         .horizontal-scroll { 
-            padding: 10px 0; gap: 20px; 
+            display: flex; overflow-x: scroll; 
+            padding: 10px 0; gap: 20px; -webkit-overflow-scrolling: touch; 
+            scroll-snap-type: x mandatory; scroll-behavior: smooth; 
         } 
-        /* 🃏 Tarjeta (Card) - Ajuste de tamaño para PC */
-        .card{ flex: 0 0 180px; }
-        .card img{ height:250px; } 
-
-        /* 🌟 HERO/HEADER DE NOVEDADES (HOME) */
-        .hero-static-container { height: 450px; margin-bottom: 40px; } 
-        .hero-overlay { padding: 40px 0; } 
-        .hero-overlay h1, .detail-hero-overlay h1 { font-size: 3rem; margin-bottom: 10px; } 
+        .horizontal-scroll::-webkit-scrollbar { height: 8px; }
+        .horizontal-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        /* 🃏 Tarjeta (Card) - Ajuste para PC */
+        .card{
+            flex: 0 0 180px; 
+            height: auto;
+            background:var(--bg-card); 
+            border-radius:4px; 
+            overflow:hidden; 
+            cursor:pointer; 
+            transition:transform .3s, box-shadow .3s, opacity .5s; 
+            opacity:0; 
+            box-shadow:0 1px 4px rgba(0,0,0,.5);
+        }
+        .card.show{ opacity:1; transform: scale(1); } 
+        .card:hover{ 
+            transform:scale(1.08); 
+            box-shadow:0 10px 20px var(--shadow-dark); 
+            z-index: 10; 
+            outline: 2px solid var(--accent);
+        } 
+        .card img{ 
+            display:block; width:100%; height:250px; object-fit:cover; 
+            transition:transform .3s; 
+        } 
+        .card:hover img{ transform: scale(1.05); } 
 
         /* Grid de resultados y paginación */
         #dynamicGrid { 
-            padding: 0; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; margin-top: 20px; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; margin-top: 20px; 
         } 
 
-        /* 🖼️ VISTA DE DETALLE (INMERSIVA) */
-        #detailView{ left: var(--nav-width); } 
-        /* Ajuste de Header de Detalle (No fijo a la izquierda) */
-        .detail-header{ padding:20px 0; background:rgba(15, 23, 30, 0.95); } 
-        /* Diseño de Contenido Principal (Más ancho en PC) */
-        .detail-main{ gap:40px; padding:40px 0; padding-top: 10px; max-width: 1200px; margin: 0 auto; } 
-        .details{flex:1 1 600px;} 
-        /* Ajuste de secciones de detalle */
-        .episodes{ margin-top:30px; padding-top:20px; } 
-        .episodes h3{ font-size:1.4rem; padding: 0; margin-left: var(--content-padding); } 
-        .episodes-list{ 
-            padding: 10px var(--content-padding); gap: 20px; 
-        } 
-        .detail-main { padding-left: 0; padding-right: 0; } 
-        .episodes { margin-left: calc(-1 * var(--content-padding)); margin-right: calc(-1 * var(--content-padding)); padding-left: var(--content-padding); } 
-        .episode-item{ width: 350px; } 
-        .episode-thumb{ height: 200px; } 
-        #recommendationsSection { margin-left: calc(-1 * var(--content-padding)); margin-right: calc(-1 * var(--content-padding)); padding-left: var(--content-padding); }
-        #recommendationsSection .section-title { padding-left: calc(14px + var(--content-padding)); } 
-        #recommendationsScroll { padding-left: var(--content-padding); padding-right: var(--content-padding); }
+        /* 🌟 HERO/HEADER */
+        .hero-static-container { position: relative; width: 100%; margin-bottom: 40px; height: 450px; overflow: hidden; border-radius: 8px; } 
+        .detail-hero-container { position: relative; width: 100%; height: 350px; overflow: hidden; z-index: 2; border-radius: 8px; } 
+        .hero-overlay { padding: 40px var(--content-padding); } 
+        .hero-overlay h1, .detail-hero-overlay h1 { font-size: 3rem; } 
+        .detail-hero-overlay { padding: 40px var(--content-padding); }
 
         /* ------------------------------------------- */
-        /* 🎥 VISTA DEL REPRODUCTOR (NUEVA) */
+        /* 🖼️ VISTA DE DETALLE (INMERSIVA) */
+        /* ------------------------------------------- */
+        #detailView{ 
+            left: var(--nav-width); 
+            z-index:200; 
+            display:none; 
+            animation:fade .3s;
+            background: var(--bg-primary); 
+        } 
+        #detailBackground { position: fixed; left: var(--nav-width); width: calc(100% - var(--nav-width)); } 
+        .detail-header{ 
+            position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:20px; padding:20px var(--content-padding); 
+            background:rgba(15, 23, 30, 0.95); backdrop-filter:blur(10px); box-shadow:0 2px 10px rgba(0,0,0,.5); 
+        } 
+        .detail-main{ 
+            display:flex; flex-wrap:wrap; gap:40px; padding:40px var(--content-padding); padding-top: 10px; 
+        } 
+        .details{flex:1 1 600px;} 
+        .episodes{ 
+            margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,.15); 
+        } 
+        .episodes h3{ margin-bottom:15px; font-size:1.4rem; } 
+        .episodes-list{ 
+            display: flex; overflow-x: scroll; 
+            padding: 10px 0; gap: 20px; 
+            scroll-snap-type: x mandatory; 
+        } 
+        .episode-item{ width: 350px; } 
+        .episode-thumb{ height: 200px; } 
+
+        /* ------------------------------------------- */
+        /* 🎥 VISTA DEL REPRODUCTOR (HLS) */
         /* ------------------------------------------- */
         #playerView {
             position: fixed; inset: 0; left: var(--nav-width); background: var(--bg-darker); 
-            z-index: 300; display: none; padding: 0; /* Ocupa la pantalla completa del contenido */
+            z-index: 300; display: none; padding: 0;
         }
-        /* Contenedor del video - Centrado y con ancho/alto máx para PC */
         .player-container {
             width: 100%;
             height: 100%;
-            max-width: 100%;
-            max-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: var(--bg-darker);
@@ -168,7 +218,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--accent);
             color: var(--text);
             padding: 8px 15px;
             border-radius: 4px;
@@ -179,21 +229,18 @@
             transition: background-color 0.2s;
         }
         #closePlayerBtn:hover {
-            background: var(--accent);
+            background: var(--accent-2);
         }
-        /* Estilo del reproductor de Video.js */
+        /* Estilo del reproductor de Video.js (Ajuste a contenedor) */
         .video-js {
             width: 100%;
             height: 100%;
+            min-height: 400px; /* Mínimo de altura para PC */
         }
-        /* Media Query para móvil (mantener estilos base de PC, pero ajustar algunos tamaños si se visualiza en pequeño) */
-        @media (max-width: 1024px) {
-            :root { --content-padding: 20px; }
-            .card{ flex: 0 0 150px; }
-            .card img{ height:200px; } 
-            #searchResultsGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; } 
-            .section-title { font-size: 1.6rem; }
-        }
+        
+        /* Estilos menores */
+        .btn{ border:0; background:var(--accent); color:var(--text); padding:10px 18px; border-radius:4px; font-weight:600; cursor:pointer; transition: transform .2s, background-color .2s; } 
+        .btn:hover{background:var(--accent-2);transform:translateY(-1px);box-shadow: 0 4px 10px rgba(0,0,0,0.3); outline: none;}
     </style>
 </head>
 <body>
@@ -228,7 +275,7 @@
     <main>
         <div id="mainView">
             <div id="content"> 
-            </div>
+                </div>
             
             <div id="gridContainer" style="min-height: 100px;"> 
                 <h2 id="gridTitle" class="section-title" style="display:none; padding-top: 20px;"></h2>
@@ -246,7 +293,7 @@
             </div>
             <h2 id="searchResultsTitle"></h2>
             <div id="searchResultsGrid">
-                <p style="color:var(--muted); padding: 50px 0; text-align: center;">Empieza a escribir para buscar (título o género)...</p>
+                <p style="color:var(--muted); padding: 50px 0; text-align: center;">Escribe al menos dos caracteres para iniciar la búsqueda.</p>
             </div>
         </div>
     </main>
@@ -270,7 +317,6 @@
         
         <div class="detail-main">
             <div class="details">
-                <h2 id="detailName"></h2>
                 <div id="detailActionButtons">
                     <button id="reproduceBtn" style="display:none;"></button>
                     <button id="favoriteBtn"><i class="fas fa-heart"></i></button>
@@ -306,7 +352,6 @@
         </div>
     </div>
 
-
     <script>
         // --- CONSTANTES Y VARIABLES ---
         const ANIME_JSON = "https://raw.githubusercontent.com/R3D-GHOST/json/refs/heads/main/data.json";
@@ -316,52 +361,35 @@
         let currentTab = 'home', currentItem = null;
         let allContent = [];
 
-        // ** VARIABLES DE PAGINACIÓN (CARGA INFINITA) **
+        // PAGINACIÓN
         const itemsPerLoad = 30;
         let currentPage = 0;
         let currentList = [];
-        let isPaginating = false; // Bandera para evitar cargas múltiples
+        let isPaginating = false; 
 
-        // Referencias del DOM
+        // DOM REFERENCES
         const content = document.getElementById('content');
         const detailView = document.getElementById('detailView');
         const detailBackground = document.getElementById('detailBackground');
-        const detailBackgroundImage = document.getElementById('detailBackgroundImage');
-        const backBtn = document.getElementById('backBtn');
+        const sideNavItems = document.querySelectorAll('#sideNav .nav-item');
         const mainView = document.getElementById('mainView');
         const searchView = document.getElementById('searchView');
         const searchInput = document.getElementById('searchInput');
-        const searchResultsGrid = document.getElementById('searchResultsGrid');
-        const searchResultsTitle = document.getElementById('searchResultsTitle');
-        // Referencia del menú vertical
-        const sideNavItems = document.querySelectorAll('#sideNav .nav-item');
-        const favoriteBtn = document.getElementById('favoriteBtn');
-        const reproduceBtn = document.getElementById('reproduceBtn');
-        const detailTitle = document.getElementById('detailTitle');
-        const detailHeroImage = document.getElementById('detailHeroImage');
-        const detailHeroTitle = document.getElementById('detailHeroTitle');
-        const detailDesc = document.getElementById('detailDesc');
-        const detailGenres = document.getElementById('detailGenres');
-        const episodesSection = document.getElementById('detailEpisodes');
-        const episodesListContainer = document.querySelector('.episodes-list');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const recommendationsSection = document.getElementById('recommendationsSection');
-        const recommendationsScroll = document.getElementById('recommendationsScroll');
         const dynamicGrid = document.getElementById('dynamicGrid');
-        const gridTitle = document.getElementById('gridTitle');
-        
-        // Referencias de la nueva vista del reproductor
+        const loadingIndicator = document.getElementById('loadingIndicator');
         const playerView = document.getElementById('playerView');
         const closePlayerBtn = document.getElementById('closePlayerBtn');
-
-        // Referencia al reproductor de Video.js (se inicializa más tarde)
+        const reproduceBtn = document.getElementById('reproduceBtn');
+        const episodesListContainer = document.querySelector('.episodes-list');
+        
         let player = null;
 
 
         // ----------------------------------------------------
-        // --- FUNCIONES DE ESTADO (CACHE) ---
+        // --- FUNCIONES DE ESTADO Y CACHE (SIMPLIFICADAS) ---
 
         function getLastWatchedEpisodeIndex(seriesId, episodeIndex = undefined) { 
+            // Implementación de LocalStorage para progreso
             try { 
                 const progress = localStorage.getItem('animebox_progress'); 
                 let progressData = progress ? JSON.parse(progress) : {}; 
@@ -374,84 +402,69 @@
                 } 
             } catch(e) { return undefined; } 
         } 
-        function getWatchedEpisodes() { 
-            try { 
-                const watched = localStorage.getItem('animebox_watched'); 
-                return watched ? JSON.parse(watched) : {}; 
-            } catch(e) { return {}; } 
-        } 
         function isEpisodeWatched(seriesId, episodeIndex) { 
-            const watched = getWatchedEpisodes(); 
-            return watched[seriesId] && watched[seriesId].includes(episodeIndex); 
+            // Implementación de LocalStorage para episodios vistos
+            try { 
+                const watched = JSON.parse(localStorage.getItem('animebox_watched') || '{}'); 
+                return watched[seriesId] && watched[seriesId].includes(episodeIndex); 
+            } catch(e) { return false; } 
         } 
         function saveWatchedEpisode(seriesId, episodeIndex) { 
-            let watched = getWatchedEpisodes(); 
-            if (!watched[seriesId]) { 
-                watched[seriesId] = []; 
-            } 
-            if (!watched[seriesId].includes(episodeIndex)) { 
-                watched[seriesId].push(episodeIndex); 
-                localStorage.setItem('animebox_watched', JSON.stringify(watched)); 
-            } 
-        } 
+            // Guarda el episodio como visto
+            try {
+                let watched = JSON.parse(localStorage.getItem('animebox_watched') || '{}'); 
+                if (!watched[seriesId]) watched[seriesId] = []; 
+                if (!watched[seriesId].includes(episodeIndex)) { 
+                    watched[seriesId].push(episodeIndex); 
+                    localStorage.setItem('animebox_watched', JSON.stringify(watched)); 
+                }
+            } catch(e) { console.error("Error saving watched:", e); }
+        }
         function getFavorites() { 
-            try { 
-                const favs = localStorage.getItem('animebox_favorites'); 
-                return favs ? JSON.parse(favs) : []; 
-            } catch(e) { return []; } 
-        } 
-        function saveFavorites(favs) { 
-            try { 
-                localStorage.setItem('animebox_favorites', JSON.stringify(favs)); 
-            } catch(e) { 
-                console.error("Error al guardar favoritos:", e); 
-            } 
-        } 
-        function isFavorite(item) { 
-            const favs = getFavorites(); 
-            const itemId = item.id || item.title; 
-            return favs.some(fav => (fav.id || fav.title) === itemId); 
+            // Obtener lista de favoritos
+            try { return JSON.parse(localStorage.getItem('animebox_favorites') || '[]'); } catch(e) { return []; } 
         } 
         function toggleFavorite(item) { 
+            // Alternar el estado de favorito
             let favs = getFavorites(); 
             const itemId = item.id || item.title; 
             const index = favs.findIndex(fav => (fav.id || fav.title) === itemId); 
+            const favoriteBtn = document.getElementById('favoriteBtn');
             const itemToSave = { ...item, id: itemId }; 
+
             if (index > -1) { 
                 favs.splice(index, 1); 
-                favoriteBtn.classList.remove('active'); 
-                if(currentTab === 'favorites') { 
-                    currentPage = 0; 
-                    dynamicGrid.innerHTML = '';
-                    loadMoreItems(getFavorites());
-                } 
+                if (favoriteBtn) favoriteBtn.classList.remove('active'); 
+                if(currentTab === 'favorites') renderCurrentTab(); 
             } else { 
                 favs.push(itemToSave); 
-                favoriteBtn.classList.add('active'); 
+                if (favoriteBtn) favoriteBtn.classList.add('active'); 
             } 
-            saveFavorites(favs); 
+            localStorage.setItem('animebox_favorites', JSON.stringify(favs)); 
         } 
 
-        // ----------------------------
-        // --- Funciones de Datos y Separación ---
+        // ----------------------------------------------------
+        // --- MANEJO DE DATOS ---
+
         async function fetchData(){ 
+            // Cargar datos principales y canales
             try { 
                 loadingIndicator.classList.add('show');
                 contentData = await (await fetch(ANIME_JSON)).json(); 
                 series = contentData.filter(item => item.episodes && item.episodes.length > 0); 
                 movies = contentData.filter(item => !item.episodes || item.episodes.length === 0); 
                 await fetchChannels(); 
-                combineAllContent(); 
+                allContent = [...contentData, ...channels]; 
                 loadingIndicator.classList.remove('show');
                 renderCurrentTab(); 
             } catch(e){ 
                 console.error("Error al cargar los datos:", e); 
-                contentData=[]; series=[]; movies=[]; channels=[]; 
-                content.innerHTML = `<p style="color:var(--accent); padding: 50px 3vw; text-align: center;">❌ Error al cargar los datos. Intenta recargar la página.</p>`; 
+                content.innerHTML = `<p style="color:var(--accent); padding: 50px 0; text-align: center;">❌ Error al cargar los datos. Intenta recargar la página.</p>`; 
                 loadingIndicator.classList.remove('show');
             } 
         } 
         async function fetchChannels(){ 
+            // Lógica simplificada para parsear el M3U
             try { 
                 const res = await fetch(M3U8_URL); 
                 const text = await res.text(); 
@@ -459,7 +472,7 @@
                 let current = null; channels=[]; 
                 for(const lineRaw of lines){ 
                     const line = lineRaw.trim(); 
-                    if(!line.startsWith('#') && line.length > 0 && line.includes('://')) { // Simplificar la detección de URL
+                    if(!line.startsWith('#') && line.length > 0 && line.includes('://')) { 
                         if (current) {
                             current.video_url = line;
                             channels.push(current);
@@ -479,38 +492,182 @@
                 channels=[]; 
             } 
         } 
-        function combineAllContent() { allContent = [...contentData, ...channels]; } 
-        function getRecommendations(currentItem) { 
-            if (!currentItem) return []; 
-            const currentId = currentItem.id || currentItem.title; 
-            const currentGenre = currentItem.genre || []; 
-            let filteredContent = allContent.filter(item => (item.id || item.title) !== currentId); 
-            let genreRecs = []; 
-            if (currentGenre.length > 0) { 
-                genreRecs = filteredContent 
-                    .filter(item => item.genre && item.genre.some(g => currentGenre.includes(g))) 
-                    .sort(() => 0.5 - Math.random()) 
-                    .slice(0, 7); 
-            } 
-            let fillerRecs = filteredContent 
-                .filter(item => (item.episodes ? true : false) === (currentItem.episodes ? true : false)) 
-                .filter(item => !genreRecs.includes(item)) 
+        function getRecommendations(item) { 
+            if (!item) return []; 
+            const currentId = item.id || item.title; 
+            const currentGenre = item.genre || []; 
+            
+            // Filtra y recomienda por género o tipo (series/películas)
+            let filteredContent = allContent.filter(i => (i.id || i.title) !== currentId); 
+            let genreRecs = filteredContent 
+                .filter(i => i.genre && i.genre.some(g => currentGenre.includes(g))) 
                 .sort(() => 0.5 - Math.random()) 
-                .slice(0, 10 - genreRecs.length); 
-            return [...genreRecs, ...fillerRecs].slice(0, 10); 
+                .slice(0, 10); 
+            
+            return genreRecs;
         } 
 
-        // ----------------------------
-        // --- Funciones de Renderizado ---
+
+        // ----------------------------------------------------
+        // --- LÓGICA DE REPRODUCCIÓN (HLS) ---
+
+        function getMimeType(url) {
+            const lowerUrl = url.toLowerCase();
+            if (lowerUrl.includes('.m3u8')) return 'application/x-mpegURL';
+            if (lowerUrl.includes('.mp4')) return 'video/mp4'; 
+            // Para otros formatos, Video.js intentará reproducir nativamente
+            return 'application/x-mpegURL'; 
+        }
+
+        function playContent(videoUrl) {
+            if (!videoUrl) {
+                alert('URL de video no disponible.');
+                return;
+            }
+
+            showView('playerView');
+            detailBackground.classList.remove('show');
+            
+            if (!player) {
+                player = videojs('hlsPlayer');
+                // Asegurar que el reproductor se destruya al cerrarse para liberar recursos
+                player.on('dispose', () => player = null); 
+            }
+            
+            const mimeType = getMimeType(videoUrl);
+            player.src({ src: videoUrl, type: mimeType });
+            
+            player.ready(function() {
+                this.play();
+            });
+        }
         
+        function closePlayerAndUpdateDetail() {
+            // Detener y destruir el reproductor
+            if (player) {
+                player.pause();
+                player.dispose(); // Destruye completamente la instancia
+            }
+            playerView.style.display = 'none';
+            
+            // Volver a la vista de detalle o principal
+            if (currentItem) {
+                openDetail(currentItem); // Reabrir para actualizar estado de "Continuar Viendo"
+            } else {
+                renderCurrentTab(); 
+            }
+        }
+        closePlayerBtn.onclick = closePlayerAndUpdateDetail;
+
+
+        // ----------------------------------------------------
+        // --- RENDERIZADO DE VISTAS ---
+
+        function showView(viewId) { 
+            // Control de vistas (simultáneamente solo se ve una)
+            const views = [mainView, searchView, detailView, playerView];
+            views.forEach(v => v.style.display = 'none'); 
+
+            document.getElementById(viewId).style.display = 'block'; 
+        } 
+
+        function renderCurrentTab(){ 
+            // Lógica de navegación principal
+            sideNavItems.forEach(b => b.classList.remove('active')); 
+            const activeNavButton = document.querySelector(`#sideNav .nav-item[data-tab="${currentTab}"]`);
+            if (activeNavButton) activeNavButton.classList.add('active'); 
+            
+            mainView.scrollTo({top: 0, behavior: 'instant'}); 
+
+            if (currentTab === 'search') { 
+                showView('searchView'); 
+                searchInput.focus(); 
+                handleSearchInput();
+                return; 
+            } 
+            
+            showView('mainView'); 
+            content.innerHTML = '';
+            dynamicGrid.innerHTML = '';
+            document.getElementById('gridTitle').style.display = 'none';
+            
+            let list = [];
+            let title = '';
+
+            if(currentTab === 'home'){ 
+                renderHomePage(); 
+                return;
+            } else if (currentTab === 'series') { 
+                list = series; title = 'Todas las Series'; 
+            } else if (currentTab === 'movies') { 
+                list = movies; title = 'Todas las Películas'; 
+            } else if (currentTab === 'channels') { 
+                list = channels; title = 'Todos los Canales en Vivo'; 
+            } else if (currentTab === 'favorites') { 
+                list = getFavorites(); title = 'Mis Favoritos'; 
+            } 
+            
+            setupGridPage(list, title);
+        } 
+
+        sideNavItems.forEach(btn => btn.onclick = () => { 
+            currentTab = btn.dataset.tab; 
+            renderCurrentTab(); 
+        }); 
+
+        function renderHomePage() { 
+            // Renderizar el Hero
+            const featuredItem = allContent[0]; 
+            if (featuredItem) { 
+                const heroElement = renderStaticHero(featuredItem); 
+                if (heroElement) content.appendChild(heroElement); 
+            } 
+            
+            // Renderizar secciones horizontales
+            const sections = [ 
+                { title: ' Canales en Vivo', list: channels.slice(0, 10) }, 
+                { title: ' Infantil', genre: 'Infantil' }, 
+                { title: ' Romance', genre: 'Romance' }, 
+                { title: ' Más Vistas', list: [...series, ...movies].sort(() => 0.5 - Math.random()).slice(0, 10) },
+            ]; 
+
+            sections.forEach((section) => { 
+                let list = section.list || []; 
+                if (section.genre) { 
+                    list = allContent.filter(a => a.genre && a.genre.some(g => g === section.genre)).sort(() => 0.5 - Math.random()).slice(0, 10); 
+                } 
+                if (list.length > 0) { 
+                    const sectionDiv = document.createElement('div'); 
+                    sectionDiv.className = 'content-section'; 
+                    sectionDiv.innerHTML = `<h2 class="section-title">${section.title}</h2><div class="horizontal-scroll"></div>`;
+                    const scrollDiv = sectionDiv.querySelector('.horizontal-scroll');
+                    list.forEach(item => scrollDiv.appendChild(createCardHTML(item))); 
+                    content.appendChild(sectionDiv); 
+                } 
+            }); 
+        } 
+
+        function createCardHTML(item) { 
+            // Crea una tarjeta de contenido
+            const cover = item.coverImage || item.logo || 'https://via.placeholder.com/180x250?text=Portada'; 
+            const spanText = item.isChannel ? 'En vivo' : (item.genre ? item.genre[0] : ''); 
+            const card = document.createElement('div'); 
+            card.className = 'card'; 
+            card.tabIndex = 0;
+            card.innerHTML = `<img src="${cover}" alt="${item.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/180x250?text=Portada';"><div class="info"><h3>${item.title}</h3><span>${spanText}</span></div>`; 
+            card.onclick = () => openDetail(item); 
+            setTimeout(() => card.classList.add('show'), Math.random() * 50); 
+            return card; 
+        } 
+
         function renderStaticHero(item) { 
-            if (!item) return null; 
+            // Crea el Hero Banner
             const container = document.createElement('div'); 
             container.className = 'hero-static-container'; 
             const heroCover = item.coverImage || 'https://via.placeholder.com/1200x450?text=Última Novedad'; 
             const itemId = item.id || item.title; 
             container.innerHTML = ` 
-                <img src="${heroCover}" alt="${item.title}" tabindex="-1" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x450?text=Última Novedad';"> 
+                <img src="${heroCover}" alt="${item.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/1200x450?text=Última Novedad';"> 
                 <div class="hero-overlay"> 
                     <h1>${item.title}</h1> 
                     <p>${item.description || 'La última adición a nuestro catálogo premium. ¡No te la pierdas!'}</p> 
@@ -522,428 +679,179 @@
             return container; 
         } 
 
-        function createCardHTML(item) { 
-            const cover = item.coverImage || item.logo || 'https://via.placeholder.com/180x250?text=Portada'; 
-            const spanText = item.isChannel ? 'En vivo' : (item.genre ? item.genre[0] : ''); 
-            const card = document.createElement('div'); 
-            card.className = 'card'; 
-            card.innerHTML = `<img src="${cover}" alt="${item.title}" onerror="this.onerror=null;this.src='https://via.placeholder.com/180x250?text=Portada';"><div class="info"><h3>${item.title}</h3><span>${spanText}</span></div>`; 
-            card.onclick = () => openDetail(item); 
-            // Tiempo de espera reducido para una carga inicial más rápida de las tarjetas
-            setTimeout(() => card.classList.add('show'), Math.random() * 50); 
-            return card; 
-        } 
-
-        function renderHomePage() { 
-            dynamicGrid.innerHTML = '';
-            gridTitle.style.display = 'none';
-
-            content.innerHTML = ''; 
-            const featuredItem = allContent[0]; 
-            if (featuredItem) { 
-                const heroElement = renderStaticHero(featuredItem); 
-                if (heroElement) { 
-                    content.appendChild(heroElement); 
-                } 
-            } 
-            
-            // ** LISTA DE SECCIONES ACTUALIZADA **
-            const sections = [ 
-                { title: ' Canales en Vivo', list: channels.slice(0, 10) }, 
-                { title: ' Infantil', genre: 'Infantil', listType: 'all' }, 
-                { title: ' Romance', genre: 'Romance', listType: 'all' }, 
-                { title: ' Misterio', genre: 'Misterio', listType: 'all' }, 
-                { title: ' Documentales', genre: 'Documental', listType: 'all' }, 
-                { title: ' Anime', genre: 'Anime', listType: 'all' }, 
-            ]; 
-
-            sections.forEach((section) => { 
-                let list = section.list; 
-                if (section.genre) { 
-                    let source = allContent; 
-                    // Aseguramos que haya contenido para mostrar antes de crear la sección
-                    list = source.filter(a => a.genre && a.genre.some(g => g === section.genre)).sort(() => 0.5 - Math.random()).slice(0, 10); 
-                } 
-                if (list && list.length > 0) { 
-                    const sectionDiv = document.createElement('div'); 
-                    sectionDiv.className = 'content-section'; 
-                    const titleElement = document.createElement('h2'); 
-                    titleElement.className = 'section-title'; 
-                    titleElement.textContent = section.title; 
-                    const scrollDiv = document.createElement('div'); 
-                    scrollDiv.className = 'horizontal-scroll'; 
-                    list.forEach(item => { 
-                        scrollDiv.appendChild(createCardHTML(item)); 
-                    }); 
-                    sectionDiv.appendChild(titleElement); 
-                    sectionDiv.appendChild(scrollDiv); 
-                    content.appendChild(sectionDiv); 
-                } 
-            }); 
-            content.classList.add('loaded'); 
-            
-            loadingIndicator.classList.remove('show');
-        } 
-
-        // ** FUNCIÓN CLAVE: Lógica de carga 30 en 30 (OPTIMIZADA) **
+        // Lógica de carga infinita (Paginación)
         function loadMoreItems(list) {
             if (isPaginating) return; 
             isPaginating = true;
             
-            if (currentPage > 0 && dynamicGrid.children.length < list.length) {
-                loadingIndicator.classList.add('show');
-                loadingIndicator.innerHTML = `<i class="fas fa-spinner"></i> Cargando ${itemsPerLoad} más...`;
-            }
-
             const startIndex = currentPage * itemsPerLoad;
             const endIndex = startIndex + itemsPerLoad;
             const itemsToLoad = list.slice(startIndex, endIndex);
 
             if (itemsToLoad.length === 0) {
-                loadingIndicator.innerHTML = `Mostrando ${list.length} resultados. Fin del catálogo.`;
-                setTimeout(() => {
-                    loadingIndicator.classList.remove('show');
-                    isPaginating = false;
-                }, 1000);
+                loadingIndicator.innerHTML = `Fin del catálogo (${list.length} resultados).`;
+                setTimeout(() => { loadingIndicator.classList.remove('show'); isPaginating = false; }, 1000);
                 return;
             }
+            
+            if (currentPage > 0) loadingIndicator.classList.add('show');
 
             const fragment = document.createDocumentFragment();
-            itemsToLoad.forEach(item => {
-                fragment.appendChild(createCardHTML(item));
-            });
+            itemsToLoad.forEach(item => fragment.appendChild(createCardHTML(item)));
             dynamicGrid.appendChild(fragment);
 
             currentPage++;
             isPaginating = false;
             
             loadingIndicator.innerHTML = `Mostrando ${dynamicGrid.children.length} de ${list.length} resultados.`;
-            if (dynamicGrid.children.length === list.length) {
-                loadingIndicator.innerHTML = `Mostrando ${list.length} resultados. Fin del catálogo.`;
-            }
-
             setTimeout(() => loadingIndicator.classList.remove('show'), 300);
         }
 
         function setupGridPage(list, titleText) {
-            content.innerHTML = '';
-            gridTitle.textContent = titleText;
-            gridTitle.style.display = 'block';
-            dynamicGrid.innerHTML = '';
-            
-            if (list.length === 0) { 
-                dynamicGrid.innerHTML = `<p style="color:var(--muted); padding: 20px 0; text-align: center;">${currentTab === 'favorites' ? 'No tienes favoritos guardados.' : 'No hay contenido disponible.'}</p>`; 
-                loadingIndicator.classList.remove('show');
-                return;
-            }
-            
+            document.getElementById('gridTitle').textContent = titleText;
+            document.getElementById('gridTitle').style.display = 'block';
             currentList = list;
             currentPage = 0; 
             loadMoreItems(list);
         }
-
-        // ** Evento de Scroll para Carga Infinita **
         mainView.addEventListener('scroll', () => {
-            if (currentTab === 'home' || currentTab === 'search' || isPaginating) {
-                return;
-            }
-
+            if (currentTab === 'home' || currentTab === 'search' || isPaginating) return;
             const scrollThreshold = 300; 
-            
             if (mainView.scrollTop + mainView.clientHeight >= mainView.scrollHeight - scrollThreshold) {
-                if (dynamicGrid.children.length < currentList.length) {
-                    loadMoreItems(currentList);
-                } else {
-                    loadingIndicator.classList.remove('show');
-                }
+                if (dynamicGrid.children.length < currentList.length) loadMoreItems(currentList);
             }
         });
 
 
-        // --- Lógica de Vistas (Navegación) ---
-        function showView(viewId) { 
-            // Ocultar todas las vistas principales primero
-            mainView.style.display = 'none'; 
-            searchView.style.display = 'none'; 
-            detailView.style.display = 'none'; 
-            playerView.style.display = 'none'; 
+        // ----------------------------------------------------
+        // --- DETALLE DE CONTENIDO ---
 
-            // Mostrar la vista solicitada
-            if (viewId === 'playerView') {
-                playerView.style.display = 'block';
-            } else if (viewId === 'detailView') { 
-                detailView.style.display = 'block'; 
-            } else if (viewId === 'searchView') {
-                searchView.style.display = 'block';
-            } else { 
-                mainView.style.display = 'block'; 
-            } 
-        } 
-
-        function renderCurrentTab(){ 
-            sideNavItems.forEach(b => b.classList.remove('active')); 
-            const activeNavButton = document.querySelector(`#sideNav .nav-item[data-tab="${currentTab}"]`);
-            if (activeNavButton) {
-                activeNavButton.classList.add('active'); 
-            }
-
-            if (currentTab === 'search') { 
-                showView('searchView'); 
-                searchInput.focus(); 
-                handleSearchInput();
-                return; 
-            } 
-            
-            showView('mainView'); 
-            mainView.scrollTo({top: 0, behavior: 'smooth'}); 
-
-            if(currentTab === 'home'){ 
-                renderHomePage(); 
-            } else if (currentTab === 'series') { 
-                setupGridPage(series, 'Todas las Series'); 
-            } else if (currentTab === 'movies') { 
-                setupGridPage(movies, 'Todas las Películas'); 
-            } else if (currentTab === 'channels') { 
-                setupGridPage(channels, 'Todos los Canales en Vivo'); 
-            } else if (currentTab === 'favorites') { 
-                setupGridPage(getFavorites(), 'Mis Favoritos'); 
-            } 
-        } 
-
-        // Eventos de Navegación Vertical
-        sideNavItems.forEach(btn => btn.onclick = () => { 
-            currentTab = btn.dataset.tab; 
-            renderCurrentTab(); 
-        }); 
-
-        // Eventos de Buscador
-        function handleSearchInput() { 
-            const query = searchInput.value.toLowerCase().trim(); 
-            searchResultsGrid.innerHTML = ''; 
-            if (query.length < 2) { 
-                searchResultsTitle.textContent = "Empieza a escribir para buscar (título o género)..."; 
-                searchResultsGrid.innerHTML = `<p style="color:var(--muted); padding: 50px 0; text-align: center;">Escribe al menos dos caracteres para iniciar la búsqueda.</p>`; 
-                return; 
-            } 
-            const filtered = allContent.filter(item => item.title.toLowerCase().includes(query) || (item.genre && item.genre.some(g => g.toLowerCase().includes(query))) || (item.description && item.description.toLowerCase().includes(query)) ); 
-            searchResultsTitle.textContent = `Resultados para "${query}" (${filtered.length})`; 
-            if (filtered.length === 0) { 
-                searchResultsGrid.innerHTML = `<p style="color:var(--muted); padding: 20px 0; text-align: center;">No se encontraron resultados para "${query}".</p>`; 
-            } else { 
-                filtered.forEach(item => { 
-                    searchResultsGrid.appendChild(createCardHTML(item)); 
-                }); 
-            } 
-        } 
-        searchInput.addEventListener('input', handleSearchInput); 
-
-        // ** FUNCIÓN CLAVE PARA VOLVER AL DETALLE TRAS REPRODUCIR **
-        function closePlayerAndUpdateDetail() {
-            // Detener y resetear el reproductor
-            if (player) {
-                player.pause();
-                player.reset();
-            }
-            playerView.style.display = 'none';
-            // Volver a la vista de detalle
-            if (currentItem) {
-                // Reabrir el detalle para actualizar el botón "Continuar Viendo"
-                openDetail(currentItem);
-            } else {
-                // Si por alguna razón perdemos el item, volvemos a la pestaña principal
-                renderCurrentTab();
-            }
-        }
-        closePlayerBtn.onclick = closePlayerAndUpdateDetail;
-
-
-        // -------------------------------------------
-        // 🚀 Lógica del Reproductor (HLS)
-        // -------------------------------------------
-
-        function playContent(videoUrl, mimeType = 'application/x-mpegURL') {
-            if (!videoUrl) {
-                alert('URL de video no disponible.');
-                return;
-            }
-
-            // 1. Mostrar la vista del reproductor
-            showView('playerView');
-            detailBackground.classList.remove('show');
-            
-            // 2. Inicializar Video.js si no existe
-            if (!player) {
-                player = videojs('hlsPlayer');
-            }
-
-            // 3. Cargar la fuente del video
-            player.src({
-                src: videoUrl,
-                type: mimeType
-            });
-            
-            // 4. Asegurarse de que el reproductor se muestre
-            playerView.style.display = 'block';
-
-            // 5. Reproducir
-            player.ready(function() {
-                this.play();
-                // Opcional: enfocar el reproductor para permitir controles de teclado
-                this.el().focus(); 
-            });
-        }
-        
-        // Función auxiliar para determinar el tipo de MIME
-        function getMimeType(url) {
-            const lowerUrl = url.toLowerCase();
-            if (lowerUrl.includes('.m3u8')) {
-                return 'application/x-mpegURL'; // HLS
-            } else if (lowerUrl.includes('.mp4')) {
-                return 'video/mp4'; 
-            } 
-            // Para otros formatos como MKV, se requeriría un transcodificador o librerías más complejas
-            return 'video/mp4'; 
-        }
-
-        // ----------------------------
-        // --- Lógica de Detalle ---
         function openDetail(item){ 
             currentItem=item; 
             const coverUrl = item.coverImage || item.logo || 'https://via.placeholder.com/180x250?text=Portada'; 
             const seriesId = item.id || item.title; 
-            // 1. Configurar Fondo Inmersivo y Header de Detalle
-            detailBackgroundImage.src = coverUrl; 
+
+            // Mostrar y configurar vista
+            document.getElementById('detailBackgroundImage').src = coverUrl; 
             detailBackground.classList.add('show'); 
             showView('detailView'); 
-            detailView.scrollTo({top: 0, behavior: 'smooth'}); 
-            detailHeroImage.src = coverUrl; 
-            detailHeroTitle.textContent = item.title; 
-            detailTitle.textContent=item.title; 
-            // 2. Rellenar detalles básicos
-            detailDesc.textContent=item.description||'No hay descripción disponible para este contenido.'; 
-            detailGenres.textContent=Array.isArray(item.genre)&&item.genre.length?'🎭 '+item.genre.join(', '):''; 
-            // 3. Configurar Botón de Favoritos
-            favoriteBtn.onclick = () => toggleFavorite(item); 
-            if (isFavorite(item)) { 
-                favoriteBtn.classList.add('active'); 
-            } else { 
-                favoriteBtn.classList.remove('active'); 
-            } 
-            // 4. Lógica de Reproducción Dinámica
+            detailView.scrollTo({top: 0, behavior: 'instant'}); 
+
+            document.getElementById('detailHeroImage').src = coverUrl; 
+            document.getElementById('detailHeroTitle').textContent = item.title; 
+            document.getElementById('detailTitle').textContent=item.title; 
+            document.getElementById('detailDesc').textContent=item.description||'No hay descripción disponible para este contenido.'; 
+            document.getElementById('detailGenres').textContent=Array.isArray(item.genre)&&item.genre.length?'🎭 '+item.genre.join(', '):''; 
+            
+            // Botón Favoritos
+            document.getElementById('favoriteBtn').onclick = () => toggleFavorite(item); 
+            const isFav = getFavorites().some(fav => (fav.id || fav.title) === seriesId);
+            document.getElementById('favoriteBtn').classList.toggle('active', isFav);
+
+            // Lógica de Reproducción (Series vs Películas/Canales)
             episodesListContainer.innerHTML=''; 
             reproduceBtn.style.display = 'none'; 
-            episodesSection.style.display = 'block'; 
+            document.getElementById('detailEpisodes').style.display = 'block'; 
             const isSeries = item.episodes && item.episodes.length > 0; 
 
             if(isSeries){ 
+                // Lógica de Series: Continuar viendo y listado de capítulos
                 let lastWatchedIndex = getLastWatchedEpisodeIndex(seriesId); 
                 let nextEpisodeIndex = lastWatchedIndex !== undefined ? lastWatchedIndex + 1 : 0; 
-                if (nextEpisodeIndex >= item.episodes.length) { 
-                    nextEpisodeIndex = item.episodes.length - 1; 
-                } else if (nextEpisodeIndex < 0) { 
-                    nextEpisodeIndex = 0;
-                } 
-                const indexToPlayOnButton = nextEpisodeIndex; 
-                const hasStarted = lastWatchedIndex !== undefined; 
-                episodesSection.querySelector('h3').textContent = 'Capítulos'; 
+                nextEpisodeIndex = Math.min(nextEpisodeIndex, item.episodes.length - 1); 
+                nextEpisodeIndex = Math.max(0, nextEpisodeIndex); 
+                
                 reproduceBtn.style.display = 'flex'; 
-                if (hasStarted && lastWatchedIndex < item.episodes.length - 1) { 
-                    reproduceBtn.innerHTML = `<i class="fas fa-forward"></i> Continuar viendo (Cap. ${indexToPlayOnButton + 1})`; 
-                } else if (hasStarted && lastWatchedIndex === item.episodes.length - 1) { 
-                    reproduceBtn.innerHTML = `<i class="fas fa-check"></i> Visto, Ver último (Cap. ${indexToPlayOnButton + 1})`; 
-                } else { 
-                    reproduceBtn.innerHTML = `<i class="fas fa-play"></i> Ver Ahora (Cap. 1)`; 
-                } 
+                const btnText = (lastWatchedIndex !== undefined && lastWatchedIndex < item.episodes.length - 1) 
+                    ? `<i class="fas fa-forward"></i> Continuar viendo (Cap. ${nextEpisodeIndex + 1})`
+                    : `<i class="fas fa-play"></i> Ver Ahora (Cap. 1)`;
+
+                reproduceBtn.innerHTML = btnText;
+                reproduceBtn.onclick = () => {
+                    const episodeElement = episodesListContainer.children[nextEpisodeIndex];
+                    if(episodeElement) episodeElement.click();
+                    else playContent(item.episodes[nextEpisodeIndex].video_url); 
+                };
                 
-                // Función de reproducción para el botón principal "Continuar Viendo"
-                reproduceBtn.onclick = () => { 
-                    const episodeElement = episodesListContainer.children[indexToPlayOnButton]; 
-                    if(episodeElement) { 
-                        // Simular clic en el elemento del episodio
-                        episodeElement.click(); 
-                    } else { 
-                        if (item.episodes[0]) { 
-                            playContent(item.episodes[0].video_url, getMimeType(item.episodes[0].video_url)); 
-                            getLastWatchedEpisodeIndex(seriesId, 0); // Establecer el primer episodio como visto/en progreso
-                            // Se actualiza el detalle al cerrar el reproductor
-                        } 
-                    } 
-                }; 
-                
+                // Renderizar Episodios
                 item.episodes.forEach((ep,i)=>{ 
-                    const episodeIndex = i; 
-                    const isWatched = isEpisodeWatched(seriesId, episodeIndex); 
+                    const isWatched = isEpisodeWatched(seriesId, i); 
                     const episodeItem = document.createElement('div'); 
-                    const isActive = isSeries && episodeIndex === indexToPlayOnButton; 
+                    const isActive = i === nextEpisodeIndex;
                     episodeItem.className = `episode-item ${isWatched ? 'watched' : ''} ${isActive ? 'active' : ''}`; 
                     const thumbUrl = ep.thumb || item.coverImage || 'https://via.placeholder.com/350x200?text=Episodio'; 
-                    const episodeTitle = `Episodio ${i+1}: ${ep.title || item.title}`; 
                     const iconClass = isWatched ? 'fas fa-check-circle' : 'fas fa-play-circle'; 
-                    episodeItem.innerHTML = ` 
-                        <div class="episode-thumb"> 
-                            <img src="${thumbUrl}" alt="Ep. ${i+1}" onerror="this.onerror=null;this.src='https://via.placeholder.com/350x200?text=Episodio';"> 
-                            <i class="${iconClass} play-icon"></i> 
-                        </div> 
-                        <div class="episode-info"> 
-                            <strong>${episodeTitle}</strong> 
-                            <span>${ep.description || 'Sinopsis del episodio...'}</span> 
-                        </div> 
-                    `; 
-                    episodeItem.onclick = (e) => { 
-                        // Lógica de progreso y marcado de visto
-                        getLastWatchedEpisodeIndex(seriesId, episodeIndex); 
-                        saveWatchedEpisode(seriesId, episodeIndex); 
-                        
-                        // Iniciar la reproducción con el reproductor HLS
-                        playContent(ep.video_url, getMimeType(ep.video_url)); 
+                    episodeItem.innerHTML = `<div class="episode-thumb"><img src="${thumbUrl}" alt="Ep. ${i+1}"><i class="${iconClass} play-icon"></i></div><div class="episode-info"><strong>Episodio ${i+1}: ${ep.title || item.title}</strong><span>${ep.description || 'Sinopsis del episodio...'}</span></div>`; 
+                    episodeItem.onclick = () => { 
+                        getLastWatchedEpisodeIndex(seriesId, i); 
+                        saveWatchedEpisode(seriesId, i); 
+                        playContent(ep.video_url); 
                     }; 
                     episodesListContainer.appendChild(episodeItem); 
-                    if(isActive && episodesListContainer.children.length > 0) { 
-                        setTimeout(() => { 
-                            const scrollPos = episodeItem.offsetLeft - episodesListContainer.clientWidth / 2 + episodeItem.clientWidth / 2; 
-                            episodesListContainer.scrollTo({ left: scrollPos, behavior: 'smooth' }); 
-                        }, 50); 
-                    } 
+                    if(isActive) setTimeout(() => episodeItem.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50); 
                 }); 
+
             } else if(item.video_url){ 
-                // Caso de Película o Canal en Vivo
-                episodesSection.style.display = 'none'; 
+                // Lógica Películas/Canales
+                document.getElementById('detailEpisodes').style.display = 'none'; 
                 reproduceBtn.style.display = 'flex'; 
                 reproduceBtn.innerHTML = `<i class="fas fa-play"></i> ${item.isChannel ? 'Ver Canal en Vivo' : 'Reproducir Ahora'}`; 
-                reproduceBtn.onclick = () => { 
-                    playContent(item.video_url, getMimeType(item.video_url)); 
-                }; 
+                reproduceBtn.onclick = () => playContent(item.video_url); 
             } else { 
-                episodesSection.style.display = 'none'; 
+                document.getElementById('detailEpisodes').style.display = 'none'; 
                 reproduceBtn.style.display = 'none'; 
             } 
-            // 5. Renderizar Recomendaciones
+            
+            // Recomendaciones
             renderRecommendations(item); 
         } 
 
         function renderRecommendations(item) { 
+            const recommendationsScroll = document.getElementById('recommendationsScroll');
+            const recommendationsSection = document.getElementById('recommendationsSection');
             recommendationsScroll.innerHTML = ''; 
             const recommendations = getRecommendations(item); 
             if (recommendations.length > 0) { 
                 recommendationsSection.style.display = 'block'; 
-                recommendations.forEach(rec => { 
-                    recommendationsScroll.appendChild(createCardHTML(rec)); 
-                }); 
+                recommendations.forEach(rec => recommendationsScroll.appendChild(createCardHTML(rec))); 
             } else { 
                 recommendationsSection.style.display = 'none'; 
             } 
         } 
 
-        // Acción de "Volver" Manual del Detalle (vuelve a la vista principal de la pestaña)
-        backBtn.onclick=()=>{ 
+        document.getElementById('backBtn').onclick=()=>{ 
             detailView.style.display='none'; 
             detailBackground.classList.remove('show'); 
             currentItem = null; 
             renderCurrentTab(); 
         }; 
 
-        // ----------------------------
-        // --- Inicialización ---
+        // Lógica de Búsqueda
+        function handleSearchInput() { 
+            const query = searchInput.value.toLowerCase().trim(); 
+            const searchResultsGrid = document.getElementById('searchResultsGrid');
+            const searchResultsTitle = document.getElementById('searchResultsTitle');
+            searchResultsGrid.innerHTML = ''; 
+            if (query.length < 2) { 
+                searchResultsTitle.textContent = "Búsqueda"; 
+                searchResultsGrid.innerHTML = `<p style="color:var(--muted); padding: 50px 0; text-align: center;">Escribe al menos dos caracteres para iniciar la búsqueda.</p>`; 
+                return; 
+            } 
+            const filtered = allContent.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                (item.genre && item.genre.some(g => g.toLowerCase().includes(query)))
+            ); 
+            searchResultsTitle.textContent = `Resultados para "${query}" (${filtered.length})`; 
+            if (filtered.length === 0) { 
+                searchResultsGrid.innerHTML = `<p style="color:var(--muted); padding: 20px 0; text-align: center;">No se encontraron resultados para "${query}".</p>`; 
+            } else { 
+                filtered.forEach(item => searchResultsGrid.appendChild(createCardHTML(item))); 
+            } 
+        } 
+        searchInput.addEventListener('input', handleSearchInput); 
+
+        // ----------------------------------------------------
+        // --- INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded',async()=>{ 
             await fetchData(); 
         });
