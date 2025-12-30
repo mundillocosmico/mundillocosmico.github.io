@@ -1,31 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-    <title>KAWAII PLAY ULTIMATE</title>
+    <title>KAWAII PREMIUM TV</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
 :root {
-    --primary: #E50914; 
-    --bg: #050505; 
-    --card-bg: #121212; 
+    --primary: #E50914;
+    --bg: #050505;
+    --surface: #121212;
     --text: #ffffff;
-    --p-w: 180px;
-    --p-h: 260px;
+    --radius: 8px;
+    --transition: all 0.4s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
-* { box-sizing: border-box; outline: none; }
+* { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 body {
-    margin: 0; font-family: 'Inter', sans-serif;
+    margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
     background: var(--bg); color: var(--text); overflow-x: hidden;
 }
 
-h1, h2, h3, .logo, .nav-links a { font-family: 'Space Grotesk', sans-serif; }
+/* --- LOADER --- */
+#loader {
+    position: fixed; inset: 0; background: #000; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+}
+.spin { width: 50px; height: 50px; border: 3px solid #222; border-top-color: var(--primary); border-radius: 50%; animation: s 0.8s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
 
 /* --- HEADER --- */
 header {
@@ -35,270 +41,338 @@ header {
 }
 header.scrolled { background: #000; border-bottom: 1px solid #222; }
 
-.logo { color: var(--primary); font-size: 1.8rem; font-weight: 700; text-decoration: none; letter-spacing: -1.5px; }
+.nav-left { display: flex; align-items: center; gap: 30px; }
+.logo { font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 800; color: var(--primary); text-decoration: none; }
 
-.nav-links { display: flex; gap: 20px; align-items: center; }
-.nav-links a { color: #b3b3b3; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
-.nav-links a:hover, .nav-links a.active { color: #fff; }
+.menu { display: flex; gap: 20px; }
+.menu a { color: #aaa; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; position: relative; }
+.menu a.active { color: #fff; }
+.menu a.active::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px; background: var(--primary); }
 
-/* BUSCADOR */
-.search-container {
-    background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px;
-    display: flex; align-items: center; border: 1px solid transparent;
+/* --- VISTAS --- */
+.view { display: none; min-height: 100vh; animation: fade 0.4s ease-out; }
+.view.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* HERO */
+.hero {
+    height: 80vh; width: 100%; position: relative;
+    background-size: cover; background-position: center;
+    display: flex; align-items: center; padding: 0 5%;
 }
-.search-container:focus-within { border-color: var(--primary); }
-.search-container input { background: none; border: none; color: white; margin-left: 8px; font-size: 0.85rem; width: 140px; }
+.hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #050505 10%, transparent), linear-gradient(0deg, #050505, transparent); }
+.hero-content { position: relative; z-index: 10; max-width: 600px; }
+.hero-title { font-family: 'Space Grotesk'; font-size: 3.5rem; font-weight: 800; margin: 0 0 20px; }
 
-/* --- GRID Y PORTADAS --- */
-.container { padding: 100px 4% 40px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--p-w), 1fr)); gap: 20px; }
+/* GRIDS */
+.grid-container { padding: 110px 4% 50px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; }
 
 .card { 
-    background: var(--card-bg); border-radius: 8px; overflow: hidden; 
-    cursor: pointer; position: relative; transition: 0.3s;
+    position: relative; aspect-ratio: 2/3; border-radius: var(--radius); overflow: hidden; 
+    cursor: pointer; transition: var(--transition); background: #111;
 }
-.card:hover { transform: translateY(-8px); }
-.card img { width: 100%; height: var(--p-h); object-fit: cover; display: block; }
+.card:hover { transform: scale(1.08); z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.card img { width: 100%; height: 100%; object-fit: cover; }
 
-.card-title {
-    padding: 12px; font-size: 0.85rem; font-weight: 600;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+/* TV Grid */
+.tv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 110px 4% 50px; }
+.card-tv { 
+    position: relative; aspect-ratio: 16/9; background: #111; border-radius: var(--radius); 
+    overflow: hidden; cursor: pointer; border: 1px solid #222; transition: 0.3s; 
 }
+.card-tv:hover { border-color: var(--primary); transform: translateY(-5px); }
+.card-tv img { width: 100%; height: 100%; object-fit: contain; padding: 25px; }
 
-/* BOTÓN FAVORITOS Y PROGRESO */
-.fav-btn {
-    position: absolute; top: 10px; right: 10px; z-index: 10;
-    background: rgba(0,0,0,0.6); width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+.live { position: absolute; top: 10px; left: 10px; background: rgba(229,9,20,0.8); padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 5px; }
+.dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+
+/* --- REPRODUCTOR --- */
+#player { display: none; position: fixed; inset: 0; background: #000; z-index: 5000; }
+.p-body { display: grid; height: 100vh; grid-template-rows: auto 1fr; }
+.p-content { display: grid; gap: 20px; padding: 0 4% 20px; overflow-y: auto; }
+.is-serie { grid-template-columns: 1fr 380px; }
+
+.video-box { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 0 40px rgba(229,9,20,0.2); }
+video { width: 100%; height: 100%; cursor: pointer; }
+
+.skin { 
+    position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 20px 20px; 
+    background: linear-gradient(transparent, rgba(0,0,0,0.9)); 
+    display: flex; align-items: center; gap: 15px; opacity: 0; transition: 0.3s;
 }
+.video-box:hover .skin { opacity: 1; }
+.bar-bg { flex-grow: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; cursor: pointer; }
+.bar-fill { height: 100%; background: var(--primary); border-radius: 10px; width: 0%; transition: 0.1s linear; }
 
-.prog-cont { position: absolute; bottom: 42px; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.2); }
-.prog-bar { height: 100%; background: var(--primary); }
+.side { background: var(--surface); border-radius: 12px; padding: 20px; height: 100%; overflow-y: auto; }
+.ep { display: flex; gap: 12px; padding: 10px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; border: 1px solid transparent; }
+.ep.active { background: rgba(229, 9, 20, 0.1); border-color: var(--primary); }
+.ep img { width: 110px; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; }
 
-/* --- REPRODUCTOR ESTILO YOUTUBE --- */
-#player-screen {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000; z-index: 5000; overflow-y: auto;
-}
-.yt-layout { display: grid; gap: 25px; padding: 20px 4%; }
-.yt-layout.is-serie { grid-template-columns: 1fr 380px; }
-.yt-layout.is-movie { grid-template-columns: 1fr; }
-
-.video-main video { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
-
-/* LISTA DE CAPÍTULOS */
-.side-list {
-    background: #0f0f0f; border-radius: 12px; padding: 15px;
-    height: 75vh; overflow-y: auto; border: 1px solid #222;
-}
-.side-item {
-    display: flex; gap: 12px; margin-bottom: 12px; padding: 8px;
-    border-radius: 8px; cursor: pointer; align-items: center;
-}
-.side-item:hover { background: #1a1a1a; }
-.side-item.active { background: #222; border: 1px solid var(--primary); }
-
-/* MINIATURAS CAPÍTULOS IGUALES */
-.side-item img { width: 120px; height: 68px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
-.side-item-info { overflow: hidden; }
-.side-item-info h4 { 
-    margin: 0; font-size: 0.85rem; color: #fff; 
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-}
-
-.close-p { padding: 20px 4%; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 700; color: #ccc; }
-
-@media (max-width: 1100px) {
-    .yt-layout.is-serie { grid-template-columns: 1fr; }
-    .side-list { height: auto; }
-}
+@media (max-width: 1000px) { .is-serie { grid-template-columns: 1fr; } .side { height: auto; } }
 </style>
 </head>
 <body>
 
-<header id="main-nav">
-    <div style="display:flex; align-items:center; gap:30px;">
-        <a href="#" class="logo">KAWAII</a>
-        <nav class="nav-links">
-            <a onclick="filterData('all')" id="n-all" class="active">Inicio</a>
-            <a onclick="filterData('series')" id="n-series">Series</a>
-            <a onclick="filterData('movies')" id="n-movies">Películas</a>
-            <a onclick="filterData('tv')" id="n-tv">TV</a>
-            <a onclick="filterData('favs')" id="n-favs"><i class="fas fa-heart"></i></a>
+<div id="loader"><div class="spin"></div></div>
+
+<header id="h">
+    <div class="nav-left">
+        <a href="#" class="logo" onclick="showView('home')">KAWAII</a>
+        <nav class="menu">
+            <a onclick="showView('home')" id="m-home" class="active">Inicio</a>
+            <a onclick="showView('series')" id="m-series">Series</a>
+            <a onclick="showView('movies')" id="m-movies">Películas</a>
+            <a onclick="showView('tv')" id="m-tv">Canales</a>
         </nav>
     </div>
-    <div class="search-container">
-        <i class="fas fa-search" style="color:#777; font-size:0.8rem;"></i>
-        <input type="text" id="searchInput" placeholder="Buscar..." oninput="handleSearch()">
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <i class="fas fa-search" onclick="toggleSearch()" style="cursor:pointer;"></i>
+        <input type="text" id="si" placeholder="Buscar..." oninput="doSearch()" style="display:none; background:#111; border:1px solid #333; color:#fff; padding:5px 10px; border-radius:4px;">
     </div>
 </header>
 
-<main class="container">
-    <h2 id="section-title" style="margin-bottom:25px;">Novedades</h2>
-    <div id="grid" class="grid"></div>
-</main>
+<div id="v-home" class="view active">
+    <section class="hero" id="hb"></section>
+    <div style="padding: 40px 4%;">
+        <h2 style="font-family:'Space Grotesk'; margin-bottom: 20px;">Agregados recientemente</h2>
+        <div id="recent" style="display:flex; gap:15px; overflow-x:auto; padding-bottom:20px; scrollbar-width:none;"></div>
+    </div>
+</div>
 
-<div id="player-screen">
-    <div class="close-p" onclick="closePlayer()"><i class="fas fa-arrow-left"></i> VOLVER</div>
-    <div id="player-layout" class="yt-layout">
-        <div class="video-main">
-            <video id="main-video" controls playsinline></video>
-            <h2 id="v-title" style="margin-top:20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></h2>
+<div id="v-grid" class="view">
+    <div class="grid-container">
+        <h2 id="gt" style="margin-bottom:30px; font-family:'Space Grotesk'">Catálogo</h2>
+        <div class="grid" id="main-grid"></div>
+        <div id="sentinel" style="height:50px;"></div>
+    </div>
+</div>
+
+<div id="v-tv" class="view">
+    <div class="tv-grid" id="tv-grid"></div>
+</div>
+
+<div id="player">
+    <div class="p-body">
+        <div style="padding: 20px 4%; display: flex; justify-content: space-between;">
+            <div onclick="closePlayer()" style="cursor:pointer; font-weight:800;"><i class="fas fa-times"></i> CERRAR</div>
+            <div id="cur-title" style="font-weight:600; color:var(--primary)"></div>
         </div>
-        <div id="side-box" class="side-list">
-            <h3 style="font-size:1rem; margin-bottom:15px;">Capítulos</h3>
-            <div id="ep-list"></div>
+        <div id="pl" class="p-content">
+            <div class="video-box">
+                <video id="vo" onclick="tp()"></video>
+                <div class="skin">
+                    <i class="fas fa-play" id="pi" onclick="tp()"></i>
+                    <div class="bar-bg" onclick="sk(event)"><div class="bar-fill" id="bf"></div></div>
+                    <span id="pt" style="font-size:0.8rem; font-family:monospace;">00:00</span>
+                    <i class="fas fa-expand" onclick="tf()"></i>
+                </div>
+            </div>
+            <div id="ps" class="side">
+                <h3 style="margin-top:0">Capítulos</h3>
+                <div id="el"></div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-const APIS = {
-    DATA: "https://raw.githubusercontent.com/R3D-GHOST/json/refs/heads/main/data.json",
-    TV: "https://raw.githubusercontent.com/R3D-GHOST/json/refs/heads/main/CV.m3u8"
+const URLS = {
+    D: "https://raw.githubusercontent.com/R3D-GHOST/json/refs/heads/main/data.json",
+    M: "https://raw.githubusercontent.com/R3D-GHOST/json/refs/heads/main/CV.m3u8"
 };
 
-let db = [], filtered = [], hls = null;
-let currentItem = null, currentEpIdx = 0;
-let favorites = JSON.parse(localStorage.getItem('kawaii_favs') || '[]');
-
-const Memory = {
-    save: (id, epIdx, time, dur) => {
-        let h = JSON.parse(localStorage.getItem('kawaii_progress') || '{}');
-        h[id] = { epIdx, time, per: (time/dur)*100 };
-        localStorage.setItem('kawaii_progress', JSON.stringify(h));
-    },
-    get: (id) => JSON.parse(localStorage.getItem('kawaii_progress') || '{}')[id]
-};
+let db = [], filtered = [], favorites = [];
+let items = 0, cur = null, cIdx = 0, hls = null;
 
 async function init() {
-    const [d1, d2] = await Promise.all([
-        fetch(APIS.DATA).then(r => r.json()),
-        fetch(APIS.TV).then(r => r.text())
-    ]);
-    db = [...d1, ...parseM3U(d2)];
-    filtered = db;
-    render();
+    try {
+        const [r1, r2] = await Promise.all([fetch(URLS.D).then(r=>r.json()), fetch(URLS.M).then(r=>r.text())]);
+        const tv = parse(r2);
+        db = [...r1, ...tv];
+        
+        setupHome();
+        
+        // Infinite Scroll observer
+        const obs = new IntersectionObserver(e => {
+            if(e[0].isIntersecting && document.getElementById('v-grid').classList.contains('active')) {
+                if(items < filtered.length) render30();
+            }
+        }, { threshold: 0.1 });
+        obs.observe(document.getElementById('sentinel'));
+
+        document.getElementById('loader').style.display = 'none';
+    } catch(e) { console.error("Error crítico de carga"); }
 }
 
-function parseM3U(t) {
-    const res = [], lines = t.split('\n');
-    let item = null;
+function parse(t) {
+    const list = [], lines = t.split('\n');
+    let o = null;
     lines.forEach(l => {
-        if (l.includes('#EXTINF:')) item = { title: l.split(',')[1] || "Canal TV", poster: l.match(/tvg-logo="([^"]+)"/)?.[1], type: 'tv' };
-        else if (l.startsWith('http') && item) { item.video_url = l.trim(); res.push(item); item = null; }
+        if(l.includes('#EXTINF:')) o = { title: l.split(',')[1]?.trim(), poster: l.match(/tvg-logo="([^"]+)"/)?.[1], type: 'tv' };
+        else if(l.startsWith('http') && o) { o.video_url = l.trim(); list.push(o); o = null; }
     });
-    return res;
+    return list;
 }
 
-function render() {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
-    filtered.forEach(item => {
-        const mem = Memory.get(item.title);
-        const isFav = favorites.includes(item.title);
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <div class="fav-btn" onclick="toggleFav(event, '${item.title}')">
-                <i class="${isFav ? 'fas' : 'far'} fa-heart" style="color:${isFav ? '#E50914' : '#fff'}"></i>
-            </div>
-            <img src="${item.poster || item.coverImage}" loading="lazy">
-            ${mem ? `<div class="prog-cont"><div class="prog-bar" style="width:${mem.per}%"></div></div>` : ''}
-            <div class="card-title">${item.title}</div>
-        `;
-        card.onclick = () => openPlayer(item);
-        grid.appendChild(card);
-    });
-}
+function showView(v) {
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.menu a').forEach(x => x.classList.remove('active'));
+    document.getElementById('m-' + v).classList.add('active');
+    items = 0;
 
-function openPlayer(item) {
-    currentItem = item;
-    const screen = document.getElementById('player-screen');
-    const layout = document.getElementById('player-layout');
-    const epCont = document.getElementById('ep-list');
-    const mem = Memory.get(item.title);
-    
-    screen.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    document.getElementById('v-title').innerText = item.title;
-
-    if (item.episodes) {
-        layout.className = 'yt-layout is-serie';
-        document.getElementById('side-box').style.display = 'block';
-        epCont.innerHTML = '';
-        currentEpIdx = mem ? mem.epIdx : 0;
-        item.episodes.forEach((ep, i) => {
-            const div = document.createElement('div');
-            div.className = `side-item ${i === currentEpIdx ? 'active' : ''}`;
-            div.innerHTML = `
-                <img src="${item.poster || item.coverImage}">
-                <div class="side-item-info"><h4>${i+1}. ${ep.title || 'Capítulo'}</h4></div>
-            `;
-            div.onclick = () => { 
-                currentEpIdx = i; play(ep.video_url, 0); 
-                document.querySelectorAll('.side-item').forEach((s,idx)=>s.classList.toggle('active', idx===i));
-            };
-            epCont.appendChild(div);
-        });
-        play(item.episodes[currentEpIdx].video_url, mem ? mem.time : 0);
+    if(v === 'home') {
+        document.getElementById('v-home').classList.add('active');
+    } else if(v === 'tv') {
+        document.getElementById('v-tv').classList.add('active');
+        renderTV();
     } else {
-        layout.className = 'yt-layout is-movie';
-        document.getElementById('side-box').style.display = 'none';
-        play(item.video_url, mem ? mem.time : 0);
+        document.getElementById('gt').innerText = v === 'series' ? 'Series de TV' : 'Películas';
+        document.getElementById('v-grid').classList.add('active');
+        document.getElementById('main-grid').innerHTML = '';
+        if(v === 'series') filtered = db.filter(i => i.episodes);
+        else if(v === 'movies') filtered = db.filter(i => !i.episodes && i.type !== 'tv');
+        render30();
+    }
+    window.scrollTo(0,0);
+}
+
+function setupHome() {
+    const h = db.filter(i => i.poster)[0];
+    document.getElementById('hb').style.backgroundImage = `url(${h.poster || h.coverImage})`;
+    document.getElementById('hb').innerHTML = `
+        <div class="hero-content">
+            <h1 class="hero-title">${h.title}</h1>
+            <button onclick="openP(db.find(x=>x.title==='${h.title.replace(/'/g,"\\'")}'))" style="background:#fff; color:#000; padding:12px 30px; border:none; font-weight:800; border-radius:4px; cursor:pointer;">
+                <i class="fas fa-play"></i> REPRODUCIR
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('recent').innerHTML = db.slice(0,12).map(i => `
+        <div class="card" style="min-width:160px" onclick="openP(db.find(x=>x.title==='${i.title.replace(/'/g,"\\'")}'))">
+            <img src="${i.poster || i.coverImage}" loading="lazy">
+        </div>
+    `).join('');
+}
+
+function renderTV() {
+    const tv = db.filter(i => i.type === 'tv');
+    document.getElementById('tv-grid').innerHTML = tv.map(i => `
+        <div class="card-tv" onclick="openP(db.find(x=>x.title==='${i.title.replace(/'/g,"\\'")}'))">
+            <div class="live"><div class="dot"></div> EN VIVO</div>
+            <img src="${i.poster}" onerror="this.src='https://placehold.co/280x157/111/fff?text=${i.title}'">
+        </div>
+    `).join('');
+}
+
+function render30() {
+    const g = document.getElementById('main-grid');
+    const chunk = filtered.slice(items, items + 30);
+    chunk.forEach(i => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.innerHTML = `<img src="${i.poster || i.coverImage}" loading="lazy">`;
+        d.onclick = () => openP(i);
+        g.appendChild(d);
+    });
+    items += 30;
+}
+
+// PLAYER LOGIC
+const vo = document.getElementById('vo');
+
+function openP(item) {
+    cur = item;
+    document.getElementById('player').style.display = 'block';
+    document.getElementById('cur-title').innerText = item.title;
+    document.body.style.overflow = 'hidden';
+
+    if(item.episodes) {
+        document.getElementById('pl').classList.add('is-serie');
+        document.getElementById('ps').style.display = 'block';
+        cIdx = 0;
+        renderEps();
+        loadV(item.episodes[0].video_url);
+    } else {
+        document.getElementById('pl').classList.remove('is-serie');
+        document.getElementById('ps').style.display = 'none';
+        loadV(item.video_url);
     }
 }
 
-function play(url, start) {
-    const v = document.getElementById('main-video');
-    if (hls) hls.destroy();
-    const ready = () => { v.currentTime = start; v.play(); };
-    if (url.includes('.m3u8')) {
-        if (Hls.isSupported()) { hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); hls.on(Hls.Events.MANIFEST_PARSED, ready); }
-        else { v.src = url; v.onloadedmetadata = ready; }
-    } else { v.src = url; v.onloadedmetadata = ready; }
+function loadV(url) {
+    if(hls) hls.destroy();
+    if(url.includes('.m3u8')) {
+        if(Hls.isSupported()) {
+            hls = new Hls(); hls.loadSource(url); hls.attachMedia(vo);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => vo.play());
+        } else { vo.src = url; vo.play(); }
+    } else {
+        // MP4 / MKV Support
+        vo.src = url;
+        vo.play().catch(() => console.log("Error de reproducción nativa"));
+    }
 }
 
-function toggleFav(e, title) {
-    e.stopPropagation();
-    if (favorites.includes(title)) favorites = favorites.filter(t => t !== title);
-    else favorites.push(title);
-    localStorage.setItem('kawaii_favs', JSON.stringify(favorites));
-    render();
+function renderEps() {
+    document.getElementById('el').innerHTML = cur.episodes.map((e, i) => `
+        <div class="ep ${i===cIdx?'active':''}" onclick="cIdx=${i}; loadV('${e.video_url}'); renderEps()">
+            <img src="${cur.poster || cur.coverImage}">
+            <div><b>Capítulo ${i+1}</b><br><small style="color:#777">${e.title || ''}</small></div>
+        </div>
+    `).join('');
 }
 
-function handleSearch() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    filtered = db.filter(i => i.title.toLowerCase().includes(q));
-    render();
-}
+function tp() { vo.paused ? vo.play() : vo.pause(); }
+vo.onplay = () => document.getElementById('pi').className = 'fas fa-pause';
+vo.onpause = () => document.getElementById('pi').className = 'fas fa-play';
 
-function filterData(cat) {
-    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-    document.getElementById('n-'+cat).classList.add('active');
-    if(cat==='all') filtered = db;
-    else if(cat==='series') filtered = db.filter(i => i.episodes);
-    else if(cat==='movies') filtered = db.filter(i => i.video_url && !i.episodes && i.type !== 'tv');
-    else if(cat==='tv') filtered = db.filter(i => i.type === 'tv');
-    else if(cat==='favs') filtered = db.filter(i => favorites.includes(i.title));
-    render();
-}
+vo.ontimeupdate = () => {
+    document.getElementById('bf').style.width = (vo.currentTime / vo.duration) * 100 + '%';
+    const m = Math.floor(vo.currentTime / 60), s = Math.floor(vo.currentTime % 60);
+    document.getElementById('pt').innerText = `${m}:${s<10?'0'+s:s}`;
+};
 
-setInterval(() => {
-    const v = document.getElementById('main-video');
-    if (!v.paused && currentItem && v.duration > 0) Memory.save(currentItem.title, currentEpIdx, v.currentTime, v.duration);
-}, 5000);
+function sk(e) {
+    const r = e.currentTarget.getBoundingClientRect();
+    vo.currentTime = ((e.clientX - r.left) / r.width) * vo.duration;
+}
 
 function closePlayer() {
-    document.getElementById('main-video').pause();
-    document.getElementById('player-screen').style.display = 'none';
+    vo.pause(); vo.src = "";
+    document.getElementById('player').style.display = 'none';
     document.body.style.overflow = 'auto';
-    render();
+}
+
+function tf() {
+    if (!document.fullscreenElement) vo.requestFullscreen();
+    else document.exitFullscreen();
+}
+
+function toggleSearch() {
+    const i = document.getElementById('si');
+    i.style.display = i.style.display === 'none' ? 'block' : 'none';
+    if(i.style.display === 'block') i.focus();
+}
+
+function doSearch() {
+    const q = document.getElementById('si').value.toLowerCase();
+    if(q.length > 2) {
+        showView('grid');
+        document.getElementById('gt').innerText = 'Resultados para: ' + q;
+        filtered = db.filter(i => i.title.toLowerCase().includes(q));
+        document.getElementById('main-grid').innerHTML = '';
+        items = 0;
+        render30();
+    }
 }
 
 window.onscroll = () => {
-    const n = document.getElementById('main-nav');
-    if (window.scrollY > 50) n.classList.add('scrolled'); else n.classList.remove('scrolled');
+    const n = document.getElementById('h');
+    window.scrollY > 50 ? n.classList.add('scrolled') : n.classList.remove('scrolled');
 };
 
 init();
